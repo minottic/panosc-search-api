@@ -39,5 +39,9 @@
   "Affiliation": {
     "dataSource": null,
     "public": false
+  },
+  "Dataset": {
+    "dataSource": null,
+    "public": true
   }
 }
