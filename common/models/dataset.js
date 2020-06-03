@@ -9,7 +9,14 @@ module.exports = function (Dataset) {
   Dataset.find = async function (filter) {
     try {
       return await new Promise((resolve, reject) => {
-        return resolve([{payload: 'dataset'}]);
+        return resolve([
+          {
+            pid: 'testPID',
+            title: 'Test Dataset',
+            isPublic: true,
+            creationDate: new Date(),
+          },
+        ]);
       });
     } catch (err) {
       console.error(err);
@@ -25,7 +32,12 @@ module.exports = function (Dataset) {
   Dataset.findById = async function (id, filter) {
     try {
       return await new Promise((resolve, reject) => {
-        return resolve({payload: 'dataset', id});
+        return resolve({
+          pid: 'testPID',
+          title: 'Test Dataset',
+          isPublic: true,
+          creationDate: new Date(),
+        });
       });
     } catch (err) {
       console.error(err);
@@ -41,7 +53,12 @@ module.exports = function (Dataset) {
   Dataset.findByIdFiles = async function (id, filter) {
     try {
       return await new Promise((resolve, reject) => {
-        return resolve([{payload: 'dataset files', id}]);
+        return resolve([
+          {
+            id: 'testID',
+            name: 'Test Filename',
+          },
+        ]);
       });
     } catch (err) {
       console.error(err);
