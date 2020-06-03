@@ -1,5 +1,6 @@
 {
   "name": "Dataset",
+  "description": "Information about an experimental run, including optional File, Sample, Instrument and Technique.",
   "base": "Model",
   "idInjection": false,
   "options": {
@@ -8,6 +9,7 @@
   "properties": {
     "pid": {
       "type": "string",
+      "id": true,
       "required": true
     },
     "title": {
@@ -32,5 +34,173 @@
   "validations": [],
   "relations": {},
   "acls": [],
-  "methods": {}
+  "methods": {
+    "count": {
+      "accepts": [
+        {
+          "arg": "where",
+          "type": "object",
+          "required": false,
+          "description": "Criteria to match model instances",
+          "http": {
+            "source": "query"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "count",
+          "type": "object",
+          "root": true,
+          "description": "Number of dataset model instances"
+        }
+      ],
+      "description": "Count instances of the model matched by where from the data source.",
+      "http": [
+        {
+          "path": "/count",
+          "verb": "get"
+        }
+      ]
+    },
+    "findById": {
+      "accepts": [
+        {
+          "arg": "id",
+          "type": "string",
+          "required": true,
+          "description": "Model id",
+          "http": {
+            "source": "path"
+          }
+        },
+        {
+          "arg": "filter",
+          "type": "object",
+          "required": false,
+          "description": "Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({\"where\":{\"something\":\"value\"}}). See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.",
+          "http": {
+            "source": "query"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "dataset",
+          "type": "Dataset",
+          "root": true,
+          "description": "Dataset model instance"
+        }
+      ],
+      "description": "Find a model instance by {{id}} from the data source.",
+      "http": [
+        {
+          "path": "/:id",
+          "verb": "get"
+        }
+      ]
+    },
+    "find": {
+      "accepts": [
+        {
+          "arg": "filter",
+          "type": "object",
+          "required": false,
+          "description": "Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({\"where\":{\"something\":\"value\"}}). See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.",
+          "http": {
+            "source": "query"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "datasets",
+          "type": "[Dataset]",
+          "root": true,
+          "description": "Array of dataset model instances"
+        }
+      ],
+      "description": "Find all instances of the model matched by filter from the data source.",
+      "http": [
+        {
+          "path": "/",
+          "verb": "get"
+        }
+      ]
+    },
+    "findByIdFiles": {
+      "accepts": [
+        {
+          "arg": "id",
+          "type": "string",
+          "required": true,
+          "description": "Dataset id",
+          "http": {
+            "source": "path"
+          }
+        },
+        {
+          "arg": "filter",
+          "type": "object",
+          "required": false,
+          "description": "Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({\"where\":{\"something\":\"value\"}}). See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.",
+          "http": {
+            "source": "query"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "files",
+          "type": "[File]",
+          "root": true,
+          "description": "Array of dataset file model instances"
+        }
+      ],
+      "description": "Queries files of Dataset.",
+      "http": [
+        {
+          "path": "/:id/files",
+          "verb": "get"
+        }
+      ]
+    },
+    "countFiles": {
+      "accepts": [
+        {
+          "arg": "id",
+          "type": "string",
+          "required": true,
+          "description": "Dataset id",
+          "http": {
+            "source": "path"
+          }
+        },
+        {
+          "arg": "where",
+          "type": "object",
+          "required": false,
+          "description": "Criteria to match model instances",
+          "http": {
+            "source": "query"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "filesCount",
+          "type": "object",
+          "root": true,
+          "description": "Number of dataset file model instances"
+        }
+      ],
+      "description": "Counts files of Dataset.",
+      "http": [
+        {
+          "path": "/:id/files/count",
+          "verb": "get"
+        }
+      ]
+    }
+  }
 }

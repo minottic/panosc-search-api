@@ -1,5 +1,6 @@
 {
   "name": "Document",
+  "description": "Represents a scientific proposal or publication.",
   "base": "Model",
   "idInjection": false,
   "options": {
@@ -8,6 +9,7 @@
   "properties": {
     "pid": {
       "type": "string",
+      "id": true,
       "required": true
     },
     "isPublic": {
@@ -52,5 +54,99 @@
   "validations": [],
   "relations": {},
   "acls": [],
-  "methods": {}
+  "methods": {
+    "count": {
+      "accepts": [
+        {
+          "arg": "where",
+          "type": "object",
+          "required": false,
+          "description": "Criteria to match model instances",
+          "http": {
+            "source": "query"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "count",
+          "type": "object",
+          "root": true,
+          "description": "Number of document model instances"
+        }
+      ],
+      "description": "Count instances of the model matched by where from the data source.",
+      "http": [
+        {
+          "path": "/count",
+          "verb": "get"
+        }
+      ]
+    },
+    "findById": {
+      "accepts": [
+        {
+          "arg": "id",
+          "type": "string",
+          "required": true,
+          "description": "Model id",
+          "http": {
+            "source": "path"
+          }
+        },
+        {
+          "arg": "filter",
+          "type": "object",
+          "required": false,
+          "description": "Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({\"where\":{\"something\":\"value\"}}). See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.",
+          "http": {
+            "source": "query"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "document",
+          "type": "Document",
+          "root": true,
+          "description": "Document model instance"
+        }
+      ],
+      "description": "Find a model instance by {{id}} from the data source.",
+      "http": [
+        {
+          "path": "/:id",
+          "verb": "get"
+        }
+      ]
+    },
+    "find": {
+      "accepts": [
+        {
+          "arg": "filter",
+          "type": "object",
+          "required": false,
+          "description": "Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({\"where\":{\"something\":\"value\"}}). See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.",
+          "http": {
+            "source": "query"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "documents",
+          "type": "[Document]",
+          "root": true,
+          "description": "Array of document model instances"
+        }
+      ],
+      "description": "Find all instances of the model matched by filter from the data source.",
+      "http": [
+        {
+          "path": "/",
+          "verb": "get"
+        }
+      ]
+    }
+  }
 }

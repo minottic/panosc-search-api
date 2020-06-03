@@ -1,5 +1,6 @@
 {
   "name": "Instrument",
+  "description": "Beam line where experiment took place.",
   "base": "Model",
   "idInjection": false,
   "options": {
@@ -25,5 +26,99 @@
   "validations": [],
   "relations": {},
   "acls": [],
-  "methods": {}
+  "methods": {
+    "count": {
+      "accepts": [
+        {
+          "arg": "where",
+          "type": "object",
+          "required": false,
+          "description": "Criteria to match model instances",
+          "http": {
+            "source": "query"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "count",
+          "type": "object",
+          "root": true,
+          "description": "Number of instrument model instances"
+        }
+      ],
+      "description": "Count instances of the model matched by where from the data source.",
+      "http": [
+        {
+          "path": "/count",
+          "verb": "get"
+        }
+      ]
+    },
+    "findById": {
+      "accepts": [
+        {
+          "arg": "id",
+          "type": "string",
+          "required": true,
+          "description": "Model id",
+          "http": {
+            "source": "path"
+          }
+        },
+        {
+          "arg": "filter",
+          "type": "Instrument",
+          "required": false,
+          "description": "Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({\"where\":{\"something\":\"value\"}}). See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.",
+          "http": {
+            "source": "query"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "instrument",
+          "type": "object",
+          "root": true,
+          "description": "Instrument model instance"
+        }
+      ],
+      "description": "Find a model instance by {{id}} from the data source.",
+      "http": [
+        {
+          "path": "/:id",
+          "verb": "get"
+        }
+      ]
+    },
+    "find": {
+      "accepts": [
+        {
+          "arg": "filter",
+          "type": "object",
+          "required": false,
+          "description": "Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({\"where\":{\"something\":\"value\"}}). See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.",
+          "http": {
+            "source": "query"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "instruments",
+          "type": "[Instrument]",
+          "root": true,
+          "description": "Array of instrument model instances"
+        }
+      ],
+      "description": "Find all instances of the model matched by filter from the data source.",
+      "http": [
+        {
+          "path": "/",
+          "verb": "get"
+        }
+      ]
+    }
+  }
 }
