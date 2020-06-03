@@ -1,21 +1,12 @@
 {
-  "name": "Affiliation",
+  "name": "Member",
   "base": "Model",
   "idInjection": false,
   "options": {
     "validateUpsert": true
   },
   "properties": {
-    "name": {
-      "type": "string"
-    },
-    "address": {
-      "type": "string"
-    },
-    "city": {
-      "type": "string"
-    },
-    "country": {
+    "role": {
       "type": "string"
     }
   },

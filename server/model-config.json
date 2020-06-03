@@ -43,5 +43,37 @@
   "Dataset": {
     "dataSource": null,
     "public": true
+  },
+  "Document": {
+    "dataSource": null,
+    "public": true
+  },
+  "File": {
+    "dataSource": null,
+    "public": false
+  },
+  "Instrument": {
+    "dataSource": null,
+    "public": true
+  },
+  "Member": {
+    "dataSource": null,
+    "public": false
+  },
+  "Parameter": {
+    "dataSource": null,
+    "public": false
+  },
+  "Person": {
+    "dataSource": null,
+    "public": false
+  },
+  "Sample": {
+    "dataSource": null,
+    "public": false
+  },
+  "Technique": {
+    "dataSource": null,
+    "public": false
   }
 }

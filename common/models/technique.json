@@ -1,5 +1,5 @@
 {
-  "name": "Dataset",
+  "name": "Technique",
   "base": "Model",
   "idInjection": false,
   "options": {
@@ -10,23 +10,9 @@
       "type": "string",
       "required": true
     },
-    "title": {
+    "name": {
       "type": "string",
       "required": true
-    },
-    "isPublic": {
-      "type": "boolean",
-      "required": true
-    },
-    "size": {
-      "type": "number"
-    },
-    "creationDate": {
-      "type": "date",
-      "required": true
-    },
-    "score": {
-      "type": "number"
     }
   },
   "validations": [],

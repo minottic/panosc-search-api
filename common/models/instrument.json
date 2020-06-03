@@ -1,5 +1,5 @@
 {
-  "name": "Dataset",
+  "name": "Instrument",
   "base": "Model",
   "idInjection": false,
   "options": {
@@ -10,19 +10,12 @@
       "type": "string",
       "required": true
     },
-    "title": {
+    "name": {
       "type": "string",
       "required": true
     },
-    "isPublic": {
-      "type": "boolean",
-      "required": true
-    },
-    "size": {
-      "type": "number"
-    },
-    "creationDate": {
-      "type": "date",
+    "facility": {
+      "type": "string",
       "required": true
     },
     "score": {

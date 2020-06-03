@@ -1,31 +1,23 @@
 {
-  "name": "Dataset",
+  "name": "File",
   "base": "Model",
   "idInjection": false,
   "options": {
     "validateUpsert": true
   },
   "properties": {
-    "pid": {
+    "id": {
       "type": "string",
       "required": true
     },
-    "title": {
+    "name": {
       "type": "string",
       "required": true
     },
-    "isPublic": {
-      "type": "boolean",
-      "required": true
+    "path": {
+      "type": "string"
     },
     "size": {
-      "type": "number"
-    },
-    "creationDate": {
-      "type": "date",
-      "required": true
-    },
-    "score": {
       "type": "number"
     }
   },

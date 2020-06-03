@@ -1,5 +1,5 @@
 {
-  "name": "Affiliation",
+  "name": "Parameter",
   "base": "Model",
   "idInjection": false,
   "options": {
@@ -7,15 +7,14 @@
   },
   "properties": {
     "name": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
-    "address": {
-      "type": "string"
+    "value": {
+      "type": "any",
+      "required": true
     },
-    "city": {
-      "type": "string"
-    },
-    "country": {
+    "unit": {
       "type": "string"
     }
   },

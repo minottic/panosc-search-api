@@ -1,32 +1,30 @@
 {
-  "name": "Dataset",
+  "name": "Person",
   "base": "Model",
   "idInjection": false,
   "options": {
     "validateUpsert": true
   },
   "properties": {
-    "pid": {
+    "id": {
       "type": "string",
       "required": true
     },
-    "title": {
+    "fullName": {
       "type": "string",
       "required": true
     },
-    "isPublic": {
-      "type": "boolean",
-      "required": true
+    "orcid": {
+      "type": "string"
     },
-    "size": {
-      "type": "number"
+    "researcherId": {
+      "type": "string"
     },
-    "creationDate": {
-      "type": "date",
-      "required": true
+    "firstName": {
+      "type": "string"
     },
-    "score": {
-      "type": "number"
+    "lastName": {
+      "type": "string"
     }
   },
   "validations": [],
