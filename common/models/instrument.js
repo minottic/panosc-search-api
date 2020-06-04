@@ -1,5 +1,8 @@
 'use strict';
 
+const Scicat = require('../scicat');
+const scicatInstrument = new Scicat.Instrument();
+
 module.exports = function (Instrument) {
   /**
    * Find all instances of the model matched by filter from the data source.
@@ -7,13 +10,7 @@ module.exports = function (Instrument) {
    */
 
   Instrument.find = async function (filter) {
-    try {
-      return await new Promise((resolve, reject) => {
-        return resolve([{payload: 'instrument'}]);
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    return scicatInstrument.find(filter);
   };
 
   /**
@@ -23,13 +20,7 @@ module.exports = function (Instrument) {
    */
 
   Instrument.findById = async function (id, filter) {
-    try {
-      return await new Promise((resolve, reject) => {
-        return resolve({payload: 'instrument', id});
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    return scicatInstrument.findById(id, filter);
   };
 
   /**
@@ -38,12 +29,6 @@ module.exports = function (Instrument) {
    */
 
   Instrument.count = async function (where) {
-    try {
-      return await new Promise((resolve, reject) => {
-        return resolve({count: 0});
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    return scicatInstrument.count(where);
   };
 };

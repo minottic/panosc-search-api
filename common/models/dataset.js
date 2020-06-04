@@ -1,5 +1,8 @@
 'use strict';
 
+const Scicat = require('../scicat');
+const scicatDataset = new Scicat.Dataset();
+
 module.exports = function (Dataset) {
   /**
    * Find all instances of the model matched by filter from the data source.
@@ -7,20 +10,7 @@ module.exports = function (Dataset) {
    */
 
   Dataset.find = async function (filter) {
-    try {
-      return await new Promise((resolve, reject) => {
-        return resolve([
-          {
-            pid: 'testPID',
-            title: 'Test Dataset',
-            isPublic: true,
-            creationDate: new Date(),
-          },
-        ]);
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    return scicatDataset.find(filter);
   };
 
   /**
@@ -30,18 +20,7 @@ module.exports = function (Dataset) {
    */
 
   Dataset.findById = async function (id, filter) {
-    try {
-      return await new Promise((resolve, reject) => {
-        return resolve({
-          pid: 'testPID',
-          title: 'Test Dataset',
-          isPublic: true,
-          creationDate: new Date(),
-        });
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    return scicatDataset.findById(id, filter);
   };
 
   /**
@@ -51,18 +30,7 @@ module.exports = function (Dataset) {
    */
 
   Dataset.findByIdFiles = async function (id, filter) {
-    try {
-      return await new Promise((resolve, reject) => {
-        return resolve([
-          {
-            id: 'testID',
-            name: 'Test Filename',
-          },
-        ]);
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    return scicatDataset.findByIdFiles(id, filter);
   };
 
   /**
@@ -71,13 +39,7 @@ module.exports = function (Dataset) {
    */
 
   Dataset.count = async function (where) {
-    try {
-      return await new Promise((resolve, reject) => {
-        return resolve({count: 0});
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    return scicatDataset.count(where);
   };
 
   /**
@@ -87,12 +49,6 @@ module.exports = function (Dataset) {
    */
 
   Dataset.countFiles = async function (id, where) {
-    try {
-      return await new Promise((resolve, reject) => {
-        return resolve({count: 0});
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    return scicatDataset.countFiles(id, where);
   };
 };
