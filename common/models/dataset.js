@@ -3,6 +3,9 @@
 const ScicatService = require('../scicat.service');
 const scicatDatasetService = new ScicatService.Dataset();
 
+const ResponseMapper = require('../response-mapper');
+const responseMapper = new ResponseMapper();
+
 module.exports = function (Dataset) {
   /**
    * Find all instances of the model matched by filter from the data source.
@@ -10,7 +13,12 @@ module.exports = function (Dataset) {
    */
 
   Dataset.find = async function (filter) {
-    return scicatDatasetService.find(filter);
+    try {
+      const datasets = await scicatDatasetService.find(filter);
+      return datasets.map((dataset) => responseMapper.dataset(dataset));
+    } catch (err) {
+      return err;
+    }
   };
 
   /**
@@ -20,7 +28,12 @@ module.exports = function (Dataset) {
    */
 
   Dataset.findById = async function (id, filter) {
-    return scicatDatasetService.findById(id, filter);
+    try {
+      const dataset = await scicatDatasetService.findById(id, filter);
+      return responseMapper.dataset(dataset);
+    } catch (err) {
+      return err;
+    }
   };
 
   /**
@@ -30,7 +43,15 @@ module.exports = function (Dataset) {
    */
 
   Dataset.findByIdFiles = async function (id, filter) {
-    return scicatDatasetService.findByIdFiles(id, filter);
+    try {
+      const origDatablocks = await scicatDatasetService.findByIdFiles(
+        id,
+        filter,
+      );
+      return responseMapper.files(origDatablocks);
+    } catch (err) {
+      return err;
+    }
   };
 
   /**

@@ -1,6 +1,7 @@
 module.exports = (Model, options) => {
+  'use strict';
   // Set score property
-  Model.afterRemote('find', (ctx, result, next) => {
+  Model.afterRemote('**', (ctx, result, next) => {
     ctx.result.forEach((instance) => {
       instance.score = 0;
     });
