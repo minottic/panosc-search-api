@@ -167,6 +167,7 @@ class Instrument {
         ? baseUrl + '/Instruments?filter=' + jsonFilter
         : baseUrl + '/Instruments';
       const res = await superagent.get(url);
+      return JSON.parse(res.text);
     } catch (err) {
       return err;
     }
