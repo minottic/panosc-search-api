@@ -1,7 +1,7 @@
 'use strict';
 
-const Scicat = require('../scicat');
-const scicatPublishedData = new Scicat.PublishedData();
+const ScicatService = require('../scicat.service');
+const scicatPublishedDataService = new ScicatService.PublishedData();
 
 module.exports = function (Document) {
   /**
@@ -10,7 +10,7 @@ module.exports = function (Document) {
    */
 
   Document.find = async function (filter) {
-    return scicatPublishedData.find(filter);
+    return scicatPublishedDataService.find(filter);
   };
 
   /**
@@ -20,7 +20,7 @@ module.exports = function (Document) {
    */
 
   Document.findById = async function (id, filter) {
-    return scicatPublishedData.findById(id, filter);
+    return scicatPublishedDataService.findById(id, filter);
   };
 
   /**
@@ -29,6 +29,6 @@ module.exports = function (Document) {
    */
 
   Document.count = async function (where) {
-    return scicatPublishedData.count(where);
+    return scicatPublishedDataService.count(where);
   };
 };

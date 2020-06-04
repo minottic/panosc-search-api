@@ -1,7 +1,7 @@
 'use strict';
 
-const Scicat = require('../scicat');
-const scicatInstrument = new Scicat.Instrument();
+const ScicatService = require('../scicat.service');
+const scicatInstrumentService = new ScicatService.Instrument();
 
 module.exports = function (Instrument) {
   /**
@@ -10,7 +10,7 @@ module.exports = function (Instrument) {
    */
 
   Instrument.find = async function (filter) {
-    return scicatInstrument.find(filter);
+    return scicatInstrumentService.find(filter);
   };
 
   /**
@@ -20,7 +20,7 @@ module.exports = function (Instrument) {
    */
 
   Instrument.findById = async function (id, filter) {
-    return scicatInstrument.findById(id, filter);
+    return scicatInstrumentService.findById(id, filter);
   };
 
   /**
@@ -29,6 +29,6 @@ module.exports = function (Instrument) {
    */
 
   Instrument.count = async function (where) {
-    return scicatInstrument.count(where);
+    return scicatInstrumentService.count(where);
   };
 };

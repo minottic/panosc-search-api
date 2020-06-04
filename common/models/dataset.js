@@ -1,7 +1,7 @@
 'use strict';
 
-const Scicat = require('../scicat');
-const scicatDataset = new Scicat.Dataset();
+const ScicatService = require('../scicat.service');
+const scicatDatasetService = new ScicatService.Dataset();
 
 module.exports = function (Dataset) {
   /**
@@ -10,7 +10,7 @@ module.exports = function (Dataset) {
    */
 
   Dataset.find = async function (filter) {
-    return scicatDataset.find(filter);
+    return scicatDatasetService.find(filter);
   };
 
   /**
@@ -20,7 +20,7 @@ module.exports = function (Dataset) {
    */
 
   Dataset.findById = async function (id, filter) {
-    return scicatDataset.findById(id, filter);
+    return scicatDatasetService.findById(id, filter);
   };
 
   /**
@@ -30,7 +30,7 @@ module.exports = function (Dataset) {
    */
 
   Dataset.findByIdFiles = async function (id, filter) {
-    return scicatDataset.findByIdFiles(id, filter);
+    return scicatDatasetService.findByIdFiles(id, filter);
   };
 
   /**
@@ -39,7 +39,7 @@ module.exports = function (Dataset) {
    */
 
   Dataset.count = async function (where) {
-    return scicatDataset.count(where);
+    return scicatDatasetService.count(where);
   };
 
   /**
@@ -49,6 +49,6 @@ module.exports = function (Dataset) {
    */
 
   Dataset.countFiles = async function (id, where) {
-    return scicatDataset.countFiles(id, where);
+    return scicatDatasetService.countFiles(id, where);
   };
 };
