@@ -3,6 +3,9 @@
 const ScicatService = require('../scicat.service');
 const scicatInstrumentService = new ScicatService.Instrument();
 
+const ResponseMapper = require('../response-mapper');
+const responseMapper = new ResponseMapper();
+
 module.exports = function (Instrument) {
   /**
    * Find all instances of the model matched by filter from the data source.
@@ -10,7 +13,14 @@ module.exports = function (Instrument) {
    */
 
   Instrument.find = async function (filter) {
-    return scicatInstrumentService.find(filter);
+    try {
+      const instruments = await scicatInstrumentService.find(filter);
+      return instruments.map((instrument) =>
+        responseMapper.instrument(instrument),
+      );
+    } catch (err) {
+      return err;
+    }
   };
 
   /**
@@ -20,7 +30,12 @@ module.exports = function (Instrument) {
    */
 
   Instrument.findById = async function (id, filter) {
-    return scicatInstrumentService.findById(id, filter);
+    try {
+      const instrument = await scicatInstrumentService.findById(id, filter);
+      return responseMapper.instrument(instrument);
+    } catch (err) {
+      return err;
+    }
   };
 
   /**

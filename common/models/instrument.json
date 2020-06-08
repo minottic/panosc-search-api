@@ -12,6 +12,7 @@
   "properties": {
     "pid": {
       "type": "string",
+      "id": true,
       "required": true
     },
     "name": {

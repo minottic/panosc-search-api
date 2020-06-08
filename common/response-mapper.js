@@ -45,5 +45,11 @@ module.exports = class ResponseMapper {
     );
   }
 
-  instrument(scicatInstrument) {}
+  instrument(scicatInstrument) {
+    return {
+      pid: scicatInstrument.pid,
+      name: scicatInstrument.name,
+      facility: 'ESS',
+    };
+  }
 };
