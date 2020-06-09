@@ -8,7 +8,7 @@ class Dataset {
 
   async find(filter) {
     try {
-      console.log('>>> FIND FILTER', filter);
+      console.log('>>> Dataset.find filter', JSON.stringify(filter));
       const jsonFilter = JSON.stringify(filter);
       const url = jsonFilter
         ? baseUrl + '/Datasets?filter=' + jsonFilter
