@@ -18,10 +18,13 @@ module.exports = class FilterMapper {
         if (parameters && parameters.scope && parameters.scope.where) {
           scicatFilter = mapParameters(parameters, scicatFilter);
         }
-        const include = filter.include.filter(
-          (inclusion) => inclusion.relation !== 'parameters',
-        );
-        scicatFilter.include = mapIncludeFilter(include);
+        const include = filter.include
+          .filter((inclusion) => inclusion.relation !== 'parameters')
+          .filter((inclusion) => inclusion.relation !== 'samples')
+          .filter((inclusion) => inclusion.relation !== 'techniques');
+        if (include.length > 0) {
+          scicatFilter.include = mapIncludeFilter(include);
+        }
       }
       if (filter.skip) {
         scicatFilter.skip = filter.skip;
@@ -37,7 +40,54 @@ module.exports = class FilterMapper {
     if (!filter) {
       return null;
     } else {
-      return filter;
+      let scicatFilter = {};
+      if (filter.where) {
+        if (filter.where.and) {
+          filter.where.and = filter.where.and
+            .filter((where) => !Object.keys(where).includes('isPublic'))
+            .filter((where) => !Object.keys(where).includes('type'));
+          if (filter.where.and.length > 0) {
+            scicatFilter.where = mapWhereFilter(filter.where, 'document');
+          }
+        } else if (filter.where.or) {
+          filter.where.or = filter.where.or
+            .filter((where) => !Object.keys(where).includes('isPublic'))
+            .filter((where) => !Object.keys(where).includes('type'));
+          if (filter.where.or.length > 0) {
+            scicatFilter.where = mapWhereFilter(filter.where, 'document');
+          }
+        } else {
+          delete filter.where.isPublic;
+          delete filter.where.type;
+          if (Object.keys(filter.where).length > 0) {
+            scicatFilter.where = mapWhereFilter(filter.where, 'document');
+          }
+        }
+      }
+      if (filter.include) {
+        const members = filter.include.find(
+          (inclusion) => inclusion.relation === 'members',
+        );
+        console.log('>>> document filter.include members', members);
+
+        if (members) {
+          scicatFilter = mapMembers(members, scicatFilter);
+        }
+
+        const include = filter.include
+          .filter((inclusion) => inclusion.relation !== 'datasets')
+          .filter((inclusion) => inclusion.relation !== 'members');
+        if (include.length > 0) {
+          scicatFilter.include = mapIncludeFilter(include);
+        }
+      }
+      if (filter.skip) {
+        scicatFilter.skip = filter.skip;
+      }
+      if (filter.limit) {
+        scicatFilter.limit = filter.limit;
+      }
+      return scicatFilter;
     }
   }
 
@@ -66,6 +116,13 @@ const panoscToScicatDataset = {
   creationTime: 'creationDate',
 };
 
+const panoscToScicatDocument = {
+  pid: 'pid',
+  title: 'title',
+  summary: 'abstract',
+  doi: 'doi',
+};
+
 const panoscToScicatFile = {
   id: 'id',
   name: 'dataFileList.path',
@@ -74,8 +131,8 @@ const panoscToScicatFile = {
 };
 
 const mapWhereFilter = (where, model) => {
-  console.log('>>> where', where);
-  console.log('>>> model', model);
+  console.log('>>> mapWhereFilter where', where);
+  console.log('>>> mapWhereFilter model', model);
   let scicatWhere = {};
   if (where.and) {
     switch (model) {
@@ -84,6 +141,16 @@ const mapWhereFilter = (where, model) => {
           Object.assign(
             ...Object.keys(item).map((key) => ({
               [panoscToScicatDataset[key]]: item[key],
+            })),
+          ),
+        );
+        break;
+      }
+      case 'document': {
+        scicatWhere.and = where.and.map((item) =>
+          Object.assign(
+            ...Object.keys(item).map((key) => ({
+              [panoscToScicatDocument[key]]: item[key],
             })),
           ),
         );
@@ -127,6 +194,16 @@ const mapWhereFilter = (where, model) => {
         );
         break;
       }
+      case 'document': {
+        scicatWhere.or = where.or.map((item) =>
+          Object.assign(
+            ...Object.keys(item).map((key) => ({
+              [panoscToScicatDocument[key]]: item[key],
+            })),
+          ),
+        );
+        break;
+      }
       case 'files': {
         scicatWhere.or = where.or.map((item) =>
           Object.assign(
@@ -148,12 +225,32 @@ const mapWhereFilter = (where, model) => {
         );
         break;
       }
+      case 'document': {
+        scicatWhere = Object.assign(
+          ...Object.keys(where).map((key) => ({
+            [panoscToScicatDocument[key]]: where[key],
+          })),
+        );
+        break;
+      }
       case 'files': {
         scicatWhere = Object.assign(
-          ...Object.keys(where).map((key) => {
-            return {[panoscToScicatFile[key]]: where[key]};
-          }),
+          ...Object.keys(where).map((key) => ({
+            [panoscToScicatFile[key]]: where[key],
+          })),
         );
+        break;
+      }
+      case 'members': {
+        console.log('>>> members where', where);
+        scicatWhere.or = [
+          Object.assign(
+            ...Object.keys(where).map((key) => ({
+              creator: where[key],
+              authors: where[key],
+            })),
+          ),
+        ];
         break;
       }
     }
@@ -181,6 +278,12 @@ const mapIncludeFilter = (include) =>
       }
       case 'instrument': {
         inclusion.relation = 'instrument';
+        if (item.scope) {
+          if (item.scope.where && item.scope.where.facility) {
+            delete item.scope.where.facility;
+          }
+          inclusion.scope = item.scope;
+        }
         break;
       }
       case 'samples': {
@@ -197,6 +300,31 @@ const mapIncludeFilter = (include) =>
     console.log('>>> inclusion', JSON.stringify(inclusion));
     return inclusion;
   });
+
+function mapMembers(members, filter) {
+  console.log('>>> mapMembers members', members);
+  console.log('>>> mapMembers filter', filter);
+  const person = members.scope.include.find(
+    (inclusion) => inclusion.relation === 'person',
+  );
+  console.log('>>> mapMembers person', person);
+  if (filter.where) {
+    const scicatMembers = mapWhereFilter(members.scope.where, members.relation);
+    if (filter.where.and) {
+      filter.where.and = filter.where.and.concat(scicatMembers);
+    } else if (filter.where.or) {
+      filter.where.and = scicatMembers.concat({
+        or: filter.where.or,
+      });
+      delete filter.where.or;
+    } else {
+      filter.where = {and: scicatMembers.concat(filter.where)};
+    }
+  } else {
+    filter.where = mapWhereFilter(person.scope.where, members.relation);
+  }
+  return filter;
+}
 
 const mapParameters = (parameters, filter) => {
   if (filter.where) {

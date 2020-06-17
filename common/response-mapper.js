@@ -39,16 +39,19 @@ module.exports = class ResponseMapper {
           break;
         }
         case 'samples': {
-          dataset.samples = scicatDataset.sampleId;
+          dataset.samples = [{name: 'Sample sample'}];
           break;
         }
         case 'techniques': {
-          dataset.techniques = scicatDataset.technique;
+          if (scicatDataset.techniquesList) {
+            dataset.techniques = scicatDataset.techniquesList;
+          }
           break;
         }
       }
     });
 
+    console.log('>>> dataset', dataset);
     return dataset;
   }
 
@@ -60,8 +63,8 @@ module.exports = class ResponseMapper {
     }));
   }
 
-  publishedData(scicatPublishedData) {
-    return {
+  publishedData(scicatPublishedData, filter) {
+    const document = {
       pid: scicatPublishedData.doi,
       isPublic: true,
       type: 'publication',
@@ -70,6 +73,43 @@ module.exports = class ResponseMapper {
       doi: scicatPublishedData.doi,
       score: 0,
     };
+
+    const primaryRelations = filter.include
+      ? filter.include.map((primary) => primary.relation)
+      : [];
+
+    const inclusions = filter.include
+      ? Object.assign(
+          ...filter.include.map((inclusion) =>
+            inclusion.scope
+              ? {[inclusion.relation]: inclusion.scope}
+              : {[inclusion.relation]: {}},
+          ),
+        )
+      : {};
+
+    console.log('>>> pubData inclusions', inclusions);
+
+    console.log('>>> primaryRelations', primaryRelations);
+
+    console.log('>>> pubData', scicatPublishedData);
+    primaryRelations.forEach((primary) => {
+      switch (primary) {
+        case 'datasets': {
+          document.datasets = scicatPublishedData.pidArray;
+          break;
+        }
+        case 'members': {
+          document.members = this.members(
+            scicatPublishedData,
+            inclusions.members,
+          );
+          break;
+        }
+      }
+    });
+
+    return document;
   }
 
   files(scicatOrigDatablocks) {
@@ -96,6 +136,41 @@ module.exports = class ResponseMapper {
       pid: scicatInstrument.pid,
       name: scicatInstrument.name,
       facility: 'ESS',
+    };
+  }
+
+  members(scicatPublishedData, filter) {
+    const inclusions = filter.include
+      ? Object.assign(
+          ...filter.include.map((inclusion) =>
+            inclusion.scope
+              ? {[inclusion.relation]: inclusion.scope}
+              : {[inclusion.relation]: {}},
+          ),
+        )
+      : {};
+    const creators = inclusions.person
+      ? scicatPublishedData.creator.map((creator) => ({
+          person: {fullName: creator},
+        }))
+      : {};
+    const authors = inclusions.person
+      ? scicatPublishedData.authors.map((author) => ({
+          person: {fullName: author},
+        }))
+      : {};
+    return creators.concat(authors);
+  }
+
+  person(scicatPublishedData, filter) {
+    return {
+      fullName: 'Sample FullName',
+    };
+  }
+
+  sample(scicatSample) {
+    return {
+      name: scicatSample.description,
     };
   }
 };

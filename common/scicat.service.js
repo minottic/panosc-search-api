@@ -1,7 +1,7 @@
 'use strict';
 
 const superagent = require('superagent');
-const baseUrl = 'https://scicat.esss.se/api/v3';
+const baseUrl = 'https://scitest.esss.lu.se/api/v3';
 
 class Dataset {
   constructor() {}
@@ -119,6 +119,7 @@ class PublishedData {
   async find(filter) {
     try {
       const jsonFilter = JSON.stringify(filter);
+      console.log('>>> PublishedData.find filter', jsonFilter);
       const url = jsonFilter
         ? baseUrl + '/PublishedData?filter=' + jsonFilter
         : baseUrl + '/PublishedData';
@@ -201,8 +202,24 @@ class Instrument {
   }
 }
 
+class Sample {
+  constructor() {}
+
+  async findById(id) {
+    try {
+      const encodedId = encodeURIComponent(id);
+      const url = baseUrl + '/Samples/' + encodedId;
+      const res = await superagent.get(url);
+      return JSON.parse(res.text);
+    } catch (err) {
+      return err;
+    }
+  }
+}
+
 module.exports = {
   Dataset: Dataset,
   PublishedData: PublishedData,
   Instrument: Instrument,
+  Sample: Sample,
 };

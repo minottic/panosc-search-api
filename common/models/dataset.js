@@ -19,7 +19,9 @@ module.exports = function (Dataset) {
     try {
       const scicatFilter = filterMapper.dataset(filter);
       const datasets = await scicatDatasetService.find(scicatFilter);
-      return datasets.map((dataset) => responseMapper.dataset(dataset, filter));
+      return await datasets.map((dataset) =>
+        responseMapper.dataset(dataset, filter),
+      );
     } catch (err) {
       return err;
     }

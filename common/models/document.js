@@ -3,6 +3,9 @@
 const ScicatService = require('../scicat.service');
 const scicatPublishedDataService = new ScicatService.PublishedData();
 
+const FilterMapper = require('../filter-mapper');
+const filterMapper = new FilterMapper();
+
 const ResponseMapper = require('../response-mapper');
 const responseMapper = new ResponseMapper();
 
@@ -14,8 +17,11 @@ module.exports = function (Document) {
 
   Document.find = async function (filter) {
     try {
-      const publishedData = await scicatPublishedDataService.find(filter);
-      return publishedData.map((data) => responseMapper.publishedData(data));
+      const scicatFilter = filterMapper.document(filter);
+      const publishedData = await scicatPublishedDataService.find(scicatFilter);
+      return publishedData.map((data) =>
+        responseMapper.publishedData(data, filter),
+      );
     } catch (err) {
       return err;
     }
@@ -29,11 +35,12 @@ module.exports = function (Document) {
 
   Document.findById = async function (id, filter) {
     try {
+      const scicatFilter = filterMapper.document(filter);
       const publishedData = await scicatPublishedDataService.findById(
         id,
-        filter,
+        scicatFilter,
       );
-      return responseMapper.publishedData(publishedData);
+      return responseMapper.publishedData(publishedData, filter);
     } catch (err) {
       return err;
     }
