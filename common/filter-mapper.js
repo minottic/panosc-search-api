@@ -70,7 +70,7 @@ module.exports = class FilterMapper {
         );
         console.log('>>> document filter.include members', members);
 
-        if (members) {
+        if (members && members.scope) {
           scicatFilter = mapMembers(members, scicatFilter);
         }
 
@@ -308,20 +308,25 @@ function mapMembers(members, filter) {
     (inclusion) => inclusion.relation === 'person',
   );
   console.log('>>> mapMembers person', person);
-  if (filter.where) {
-    const scicatMembers = mapWhereFilter(members.scope.where, members.relation);
-    if (filter.where.and) {
-      filter.where.and = filter.where.and.concat(scicatMembers);
-    } else if (filter.where.or) {
-      filter.where.and = scicatMembers.concat({
-        or: filter.where.or,
-      });
-      delete filter.where.or;
+  if (person.scope && person.scope.where) {
+    if (filter.where) {
+      const scicatMembers = mapWhereFilter(
+        person.scope.where,
+        members.relation,
+      );
+      if (filter.where.and) {
+        filter.where.and = filter.where.and.concat(scicatMembers);
+      } else if (filter.where.or) {
+        filter.where.and = scicatMembers.concat({
+          or: filter.where.or,
+        });
+        delete filter.where.or;
+      } else {
+        filter.where = {and: scicatMembers.concat(filter.where)};
+      }
     } else {
-      filter.where = {and: scicatMembers.concat(filter.where)};
+      filter.where = mapWhereFilter(person.scope.where, members.relation);
     }
-  } else {
-    filter.where = mapWhereFilter(person.scope.where, members.relation);
   }
   return filter;
 }

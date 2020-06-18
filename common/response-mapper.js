@@ -92,7 +92,6 @@ module.exports = class ResponseMapper {
 
     console.log('>>> primaryRelations', primaryRelations);
 
-    console.log('>>> pubData', scicatPublishedData);
     primaryRelations.forEach((primary) => {
       switch (primary) {
         case 'datasets': {
@@ -153,12 +152,12 @@ module.exports = class ResponseMapper {
       ? scicatPublishedData.creator.map((creator) => ({
           person: {fullName: creator},
         }))
-      : {};
+      : [];
     const authors = inclusions.person
       ? scicatPublishedData.authors.map((author) => ({
           person: {fullName: author},
         }))
-      : {};
+      : [];
     return creators.concat(authors);
   }
 
