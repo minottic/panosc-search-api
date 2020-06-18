@@ -19,8 +19,10 @@ module.exports = function (Document) {
     try {
       const scicatFilter = filterMapper.document(filter);
       const publishedData = await scicatPublishedDataService.find(scicatFilter);
-      return publishedData.map((data) =>
-        responseMapper.publishedData(data, filter),
+      return await Promise.all(
+        publishedData.map(
+          async (data) => await responseMapper.publishedData(data, filter),
+        ),
       );
     } catch (err) {
       return err;

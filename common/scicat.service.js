@@ -22,22 +22,17 @@ class Dataset {
 
   async findById(id, filter) {
     try {
-      if (!filter) {
-        filter = {where: {pid: id}};
-      } else {
-        if (!filter.where) {
-          filter.where = {pid: id};
-        } else {
-          filter.where['pid'] = id;
-        }
-      }
-      console.log('>>> FINDBYID FILTER', filter);
+      const encodedId = encodeURIComponent(id);
       const jsonFilter = JSON.stringify(filter);
-      const url = jsonFilter
-        ? baseUrl + '/Datasets/?filter=' + jsonFilter
-        : baseUrl + '/Datasets';
+      console.log('>>> Dataset.findById pid', encodedId);
+      console.log('>>> Dataset.findById filter', jsonFilter);
+      const url = filter
+        ? baseUrl + '/Datasets/' + encodedId + '?filter=' + jsonFilter
+        : baseUrl + '/Datasets/' + encodedId;
+      console.log('>>> Dataset.findById url', url);
       const res = await superagent.get(url);
-      return JSON.parse(res.text)[0];
+      console.log('>>> Dataset.findById res.text', res.text);
+      return JSON.parse(res.text);
     } catch (err) {
       return err;
     }

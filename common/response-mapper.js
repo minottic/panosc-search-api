@@ -1,5 +1,8 @@
 'use strict';
 
+const ScicatService = require('./scicat.service');
+const scicatDatasetService = new ScicatService.Dataset();
+
 module.exports = class ResponseMapper {
   constructor() {}
 
@@ -13,11 +16,21 @@ module.exports = class ResponseMapper {
       score: 0,
     };
 
-    const primaryRelations = filter.include
-      ? filter.include.map((primary) => primary.relation)
-      : [];
+    console.log('>>> ResponseMapper.dataset default dataset', dataset);
 
-    primaryRelations.forEach((primary) => {
+    const inclusions =
+      filter && filter.include
+        ? Object.assign(
+            ...filter.include.map((inclusion) =>
+              inclusion.scope
+                ? {[inclusion.relation]: inclusion.scope}
+                : {[inclusion.relation]: {}},
+            ),
+          )
+        : {};
+    console.log('>>> ResponseMapper.dataset inclusions', inclusions);
+
+    Object.keys(inclusions).forEach((primary) => {
       switch (primary) {
         case 'document': {
           break;
@@ -63,7 +76,7 @@ module.exports = class ResponseMapper {
     }));
   }
 
-  publishedData(scicatPublishedData, filter) {
+  async publishedData(scicatPublishedData, filter) {
     const document = {
       pid: scicatPublishedData.doi,
       isPublic: true,
@@ -74,40 +87,44 @@ module.exports = class ResponseMapper {
       score: 0,
     };
 
-    const primaryRelations = filter.include
-      ? filter.include.map((primary) => primary.relation)
-      : [];
-
-    const inclusions = filter.include
-      ? Object.assign(
-          ...filter.include.map((inclusion) =>
-            inclusion.scope
-              ? {[inclusion.relation]: inclusion.scope}
-              : {[inclusion.relation]: {}},
-          ),
-        )
-      : {};
+    const inclusions =
+      filter && filter.include
+        ? Object.assign(
+            ...filter.include.map((inclusion) =>
+              inclusion.scope
+                ? {[inclusion.relation]: inclusion.scope}
+                : {[inclusion.relation]: {}},
+            ),
+          )
+        : {};
 
     console.log('>>> pubData inclusions', inclusions);
 
-    console.log('>>> primaryRelations', primaryRelations);
-
-    primaryRelations.forEach((primary) => {
-      switch (primary) {
-        case 'datasets': {
-          document.datasets = scicatPublishedData.pidArray;
-          break;
-        }
-        case 'members': {
-          document.members = this.members(
-            scicatPublishedData,
-            inclusions.members,
-          );
-          break;
-        }
+    try {
+      if (Object.keys(inclusions).includes('datasets')) {
+        const datasets = await Promise.all(
+          scicatPublishedData.pidArray
+            .map((pid) =>
+              pid.split('/')[0] === pid.split('/')[1]
+                ? pid.split('/').slice(1).join('/')
+                : pid,
+            )
+            .map(async (pid) => await scicatDatasetService.findById(pid)),
+        );
+        document.datasets = datasets.map((dataset) =>
+          this.dataset(dataset, inclusions.datasets),
+        );
       }
-    });
-
+      if (Object.keys(inclusions).includes('members')) {
+        document.members = this.members(
+          scicatPublishedData,
+          inclusions.members,
+        );
+      }
+    } catch (err) {
+      return err;
+    }
+    console.log('>>> document', document);
     return document;
   }
 
