@@ -159,7 +159,8 @@ class Instrument {
   async find(filter) {
     try {
       const jsonFilter = JSON.stringify(filter);
-      const url = jsonFilter
+      console.log('>>> Instrument.find filter', jsonFilter);
+      const url = filter
         ? baseUrl + '/Instruments?filter=' + jsonFilter
         : baseUrl + '/Instruments';
       const res = await superagent.get(url);

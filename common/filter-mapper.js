@@ -103,7 +103,29 @@ module.exports = class FilterMapper {
     if (!filter) {
       return null;
     } else {
-      return filter;
+      let scicatFilter = {};
+      if (filter.where) {
+        if (filter.where.facility) {
+          delete filter.where.facility;
+        }
+        if (Object.keys(filter.where).length > 0) {
+          scicatFilter.where = mapWhereFilter(filter.where, 'instrument');
+        }
+      }
+      if (filter.include) {
+        // DO SOMETHING
+      }
+      if (filter.skip) {
+        scicatFilter.skip = filter.skip;
+      }
+      if (filter.limit) {
+        scicatFilter.limit = filter.limit;
+      }
+      if (Object.keys(scicatFilter).length > 0) {
+        return scicatFilter;
+      } else {
+        return null;
+      }
     }
   }
 };
@@ -239,6 +261,11 @@ const mapWhereFilter = (where, model) => {
             [panoscToScicatFile[key]]: where[key],
           })),
         );
+        break;
+      }
+      case 'instrument': {
+        console.log('>>> instrument where');
+        scicatWhere = where;
         break;
       }
       case 'members': {

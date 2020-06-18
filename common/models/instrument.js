@@ -3,6 +3,9 @@
 const ScicatService = require('../scicat.service');
 const scicatInstrumentService = new ScicatService.Instrument();
 
+const FilterMapper = require('../filter-mapper');
+const filterMapper = new FilterMapper();
+
 const ResponseMapper = require('../response-mapper');
 const responseMapper = new ResponseMapper();
 
@@ -14,7 +17,8 @@ module.exports = function (Instrument) {
 
   Instrument.find = async function (filter) {
     try {
-      const instruments = await scicatInstrumentService.find(filter);
+      const scicatFilter = filterMapper.instrument(filter);
+      const instruments = await scicatInstrumentService.find(scicatFilter);
       return instruments.map((instrument) =>
         responseMapper.instrument(instrument),
       );

@@ -152,6 +152,7 @@ module.exports = class ResponseMapper {
       pid: scicatInstrument.pid,
       name: scicatInstrument.name,
       facility: 'ESS',
+      score: 0,
     };
   }
 
