@@ -35,7 +35,11 @@ module.exports = function (Instrument) {
 
   Instrument.findById = async function (id, filter) {
     try {
-      const instrument = await scicatInstrumentService.findById(id, filter);
+      const scicatFilter = filterMapper.instrument(filter);
+      const instrument = await scicatInstrumentService.findById(
+        id,
+        scicatFilter,
+      );
       return responseMapper.instrument(instrument);
     } catch (err) {
       return err;
