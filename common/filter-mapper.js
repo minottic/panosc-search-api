@@ -105,15 +105,25 @@ module.exports = class FilterMapper {
     } else {
       let scicatFilter = {};
       if (filter.where) {
-        if (filter.where.facility) {
-          delete filter.where.facility;
+        if (filter.where.and) {
+          filter.where.and = filter.where.and.filter(
+            (where) => !Object.keys(where).includes('facility'),
+          );
+        } else if (filter.where.or) {
+          filter.where.or = filter.where.or.filter(
+            (where) => !Object.keys(where).includes('facility'),
+          );
+        } else {
+          if (filter.where.facility) {
+            delete filter.where.facility;
+          }
         }
         if (Object.keys(filter.where).length > 0) {
           scicatFilter.where = mapWhereFilter(filter.where, 'instrument');
         }
       }
       if (filter.include) {
-        // DO SOMETHING
+        scicatFilter.include = filter.include;
       }
       if (filter.skip) {
         scicatFilter.skip = filter.skip;
@@ -188,6 +198,10 @@ const mapWhereFilter = (where, model) => {
         );
         break;
       }
+      case 'instrument': {
+        scicatWhere.and = where.and;
+        break;
+      }
       case 'parameters': {
         scicatWhere.and = [];
         const name = where.and.find((condition) =>
@@ -224,6 +238,10 @@ const mapWhereFilter = (where, model) => {
             })),
           ),
         );
+        break;
+      }
+      case 'instrument': {
+        scicatWhere.or = where.or;
         break;
       }
       case 'files': {
@@ -264,7 +282,6 @@ const mapWhereFilter = (where, model) => {
         break;
       }
       case 'instrument': {
-        console.log('>>> instrument where');
         scicatWhere = where;
         break;
       }

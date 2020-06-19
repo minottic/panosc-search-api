@@ -20,16 +20,7 @@ module.exports = class ResponseMapper {
 
     console.log('>>> ResponseMapper.dataset default dataset', dataset);
 
-    const inclusions =
-      filter && filter.include
-        ? Object.assign(
-            ...filter.include.map((inclusion) =>
-              inclusion.scope
-                ? {[inclusion.relation]: inclusion.scope}
-                : {[inclusion.relation]: {}},
-            ),
-          )
-        : {};
+    const inclusions = getInclusions(filter);
     console.log('>>> ResponseMapper.dataset inclusions', inclusions);
 
     try {
@@ -38,29 +29,25 @@ module.exports = class ResponseMapper {
         const scicatPublishedData = await scicatPublishedDataService.find(
           publishedDataFilter,
         );
-        console.log(
-          '>>> ResponseMapper.dataset scicatPublishedData',
-          scicatPublishedData[0],
-        );
-        if (scicatPublishedData.length > 0) {
-          dataset.document = this.document(
-            scicatPublishedData[0],
-            inclusions.document,
-          );
-        } else {
-          dataset.document = {};
-        }
+        dataset.document =
+          scicatPublishedData.length > 0
+            ? this.document(scicatPublishedData[0], inclusions.document)
+            : {};
       }
       if (Object.keys(inclusions).includes('files')) {
-        dataset.files = this.files(scicatDataset.origdatablocks);
+        dataset.files = scicatDataset.origdatablocks
+          ? this.files(scicatDataset.origdatablocks)
+          : [];
       }
       if (Object.keys(inclusions).includes('instrument')) {
-        if (scicatDataset.instrument) {
-          dataset.instrument = this.instrument(scicatDataset.instrument);
-        }
+        dataset.instrument = scicatDataset.instrument
+          ? this.instrument(scicatDataset.instrument)
+          : {};
       }
       if (Object.keys(inclusions).includes('parameters')) {
-        dataset.parameters = this.parameters(scicatDataset.scientificMetadata);
+        dataset.parameters = scicatDataset.scientificMetadata
+          ? this.parameters(scicatDataset.scientificMetadata)
+          : [];
       }
       if (Object.keys(inclusions).includes('samples')) {
         const sampleId = scicatDataset.sampleId;
@@ -103,16 +90,7 @@ module.exports = class ResponseMapper {
       score: 0,
     };
 
-    const inclusions =
-      filter && filter.include
-        ? Object.assign(
-            ...filter.include.map((inclusion) =>
-              inclusion.scope
-                ? {[inclusion.relation]: inclusion.scope}
-                : {[inclusion.relation]: {}},
-            ),
-          )
-        : {};
+    const inclusions = getInclusions(filter);
 
     console.log('>>> pubData inclusions', inclusions);
 
@@ -203,3 +181,14 @@ module.exports = class ResponseMapper {
     };
   }
 };
+
+const getInclusions = (filter) =>
+  filter && filter.include
+    ? Object.assign(
+        ...filter.include.map((inclusion) =>
+          inclusion.scope
+            ? {[inclusion.relation]: inclusion.scope}
+            : {[inclusion.relation]: {}},
+        ),
+      )
+    : {};
