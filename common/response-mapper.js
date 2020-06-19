@@ -2,11 +2,13 @@
 
 const ScicatService = require('./scicat.service');
 const scicatDatasetService = new ScicatService.Dataset();
+const scicatPublishedDataService = new ScicatService.PublishedData();
+const scicatSampleService = new ScicatService.Sample();
 
 module.exports = class ResponseMapper {
   constructor() {}
 
-  dataset(scicatDataset, filter) {
+  async dataset(scicatDataset, filter) {
     const dataset = {
       pid: scicatDataset.pid,
       title: scicatDataset.datasetName,
@@ -30,39 +32,53 @@ module.exports = class ResponseMapper {
         : {};
     console.log('>>> ResponseMapper.dataset inclusions', inclusions);
 
-    Object.keys(inclusions).forEach((primary) => {
-      switch (primary) {
-        case 'document': {
-          break;
-        }
-        case 'files': {
-          dataset.files = this.files(scicatDataset.origdatablocks);
-          break;
-        }
-        case 'instrument': {
-          if (scicatDataset.instrument) {
-            dataset.instrument = this.instrument(scicatDataset.instrument);
-          }
-          break;
-        }
-        case 'parameters': {
-          dataset.parameters = this.parameters(
-            scicatDataset.scientificMetadata,
+    try {
+      if (Object.keys(inclusions).includes('document')) {
+        const publishedDataFilter = {where: {pidArray: scicatDataset.pid}};
+        const scicatPublishedData = await scicatPublishedDataService.find(
+          publishedDataFilter,
+        );
+        console.log(
+          '>>> ResponseMapper.dataset scicatPublishedData',
+          scicatPublishedData[0],
+        );
+        if (scicatPublishedData.length > 0) {
+          dataset.document = this.document(
+            scicatPublishedData[0],
+            inclusions.document,
           );
-          break;
-        }
-        case 'samples': {
-          dataset.samples = [{name: 'Sample sample'}];
-          break;
-        }
-        case 'techniques': {
-          if (scicatDataset.techniquesList) {
-            dataset.techniques = scicatDataset.techniquesList;
-          }
-          break;
+        } else {
+          dataset.document = {};
         }
       }
-    });
+      if (Object.keys(inclusions).includes('files')) {
+        dataset.files = this.files(scicatDataset.origdatablocks);
+      }
+      if (Object.keys(inclusions).includes('instrument')) {
+        if (scicatDataset.instrument) {
+          dataset.instrument = this.instrument(scicatDataset.instrument);
+        }
+      }
+      if (Object.keys(inclusions).includes('parameters')) {
+        dataset.parameters = this.parameters(scicatDataset.scientificMetadata);
+      }
+      if (Object.keys(inclusions).includes('samples')) {
+        const sampleId = scicatDataset.sampleId;
+        if (sampleId) {
+          const scicatSample = await scicatSampleService.findById(sampleId);
+          dataset.samples = [this.sample(scicatSample)];
+        } else {
+          dataset.samples = [];
+        }
+      }
+      if (Object.keys(inclusions).includes('techniques')) {
+        dataset.techniques = scicatDataset.techniquesList
+          ? scicatDataset.techniquesList
+          : [];
+      }
+    } catch (err) {
+      return err;
+    }
 
     console.log('>>> dataset', dataset);
     return dataset;
@@ -111,8 +127,10 @@ module.exports = class ResponseMapper {
             )
             .map(async (pid) => await scicatDatasetService.findById(pid)),
         );
-        document.datasets = datasets.map((dataset) =>
-          this.dataset(dataset, inclusions.datasets),
+        document.datasets = await Promise.all(
+          datasets.map(
+            async (dataset) => await this.dataset(dataset, inclusions.datasets),
+          ),
         );
       }
       if (Object.keys(inclusions).includes('members')) {
@@ -177,12 +195,6 @@ module.exports = class ResponseMapper {
         }))
       : [];
     return creators.concat(authors);
-  }
-
-  person(scicatPublishedData, filter) {
-    return {
-      fullName: 'Sample FullName',
-    };
   }
 
   sample(scicatSample) {
