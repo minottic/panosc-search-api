@@ -42,7 +42,7 @@ module.exports = function (Document) {
         id,
         scicatFilter,
       );
-      return responseMapper.publishedData(publishedData, filter);
+      return await responseMapper.publishedData(publishedData, filter);
     } catch (err) {
       return err;
     }
