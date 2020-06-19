@@ -1,5 +1,8 @@
 'use strict';
 
+const FilterMapper = require('./filter-mapper');
+const filterMapper = new FilterMapper();
+
 const ScicatService = require('./scicat.service');
 const scicatDatasetService = new ScicatService.Dataset();
 const scicatPublishedDataService = new ScicatService.PublishedData();
@@ -96,6 +99,8 @@ module.exports = class ResponseMapper {
 
     try {
       if (Object.keys(inclusions).includes('datasets')) {
+        const scicatFilter = filterMapper.dataset(inclusions.datasets);
+        console.log('>>> ResponseMapper dataset scicatFilter', scicatFilter);
         const datasets = await Promise.all(
           scicatPublishedData.pidArray
             .map((pid) =>
@@ -103,7 +108,10 @@ module.exports = class ResponseMapper {
                 ? pid.split('/').slice(1).join('/')
                 : pid,
             )
-            .map(async (pid) => await scicatDatasetService.findById(pid)),
+            .map(
+              async (pid) =>
+                await scicatDatasetService.findById(pid, scicatFilter),
+            ),
         );
         document.datasets = await Promise.all(
           datasets.map(
