@@ -18,6 +18,12 @@ module.exports = class FilterMapper {
         if (parameters && parameters.scope && parameters.scope.where) {
           scicatFilter = mapParameters(parameters, scicatFilter);
         }
+        const techniques = filter.include.find(
+          (inclusion) => inclusion.relation === 'techniques',
+        );
+        if (techniques && techniques.scope && techniques.scope.where) {
+          scicatFilter = mapTechniques(techniques, scicatFilter);
+        }
         const include = filter.include
           .filter((inclusion) => inclusion.relation !== 'parameters')
           .filter((inclusion) => inclusion.relation !== 'samples')
@@ -162,6 +168,11 @@ const panoscToScicatFile = {
   size: 'dataFileList.size',
 };
 
+const panoscToScicatTechniques = {
+  pid: 'techniques.pid',
+  name: 'techniques.name',
+};
+
 const mapWhereFilter = (where, model) => {
   console.log('>>> mapWhereFilter where', where);
   console.log('>>> mapWhereFilter model', model);
@@ -212,9 +223,25 @@ const mapWhereFilter = (where, model) => {
         )['value'];
         const unit = where.and.find((condition) =>
           Object.keys(condition).includes('unit'),
-        )['unit'];
+        )
+          ? where.and.find((condition) =>
+              Object.keys(condition).includes('unit'),
+            )['unit']
+          : null;
         scicatWhere.and.push({[`scientificMetadata.${name}.value`]: value});
-        scicatWhere.and.push({[`scientificMetadata.${name}.unit`]: unit});
+        if (unit) {
+          scicatWhere.and.push({[`scientificMetadata.${name}.unit`]: unit});
+        }
+        break;
+      }
+      case 'techniques': {
+        scicatWhere.and = where.and.map((item) =>
+          Object.assign(
+            ...Object.keys(item).map((key) => ({
+              [panoscToScicatTechniques[key]]: item[key],
+            })),
+          ),
+        );
         break;
       }
     }
@@ -254,6 +281,16 @@ const mapWhereFilter = (where, model) => {
         );
         break;
       }
+      case 'techniques': {
+        scicatWhere.or = where.or.map((item) =>
+          Object.assign(
+            ...Object.keys(item).map((key) => ({
+              [panoscToScicatTechniques[key]]: item[key],
+            })),
+          ),
+        );
+        break;
+      }
     }
   } else {
     switch (model) {
@@ -286,7 +323,6 @@ const mapWhereFilter = (where, model) => {
         break;
       }
       case 'members': {
-        console.log('>>> members where', where);
         scicatWhere.or = [
           Object.assign(
             ...Object.keys(where).map((key) => ({
@@ -295,6 +331,14 @@ const mapWhereFilter = (where, model) => {
             })),
           ),
         ];
+        break;
+      }
+      case 'techniques': {
+        scicatWhere = Object.assign(
+          ...Object.keys(where).map((key) => ({
+            [panoscToScicatTechniques[key]]: where[key],
+          })),
+        );
         break;
       }
     }
@@ -346,12 +390,9 @@ const mapIncludeFilter = (include) =>
   });
 
 function mapMembers(members, filter) {
-  console.log('>>> mapMembers members', members);
-  console.log('>>> mapMembers filter', filter);
   const person = members.scope.include.find(
     (inclusion) => inclusion.relation === 'person',
   );
-  console.log('>>> mapMembers person', person);
   if (person.scope && person.scope.where) {
     if (filter.where) {
       const scicatMembers = mapWhereFilter(
@@ -395,6 +436,26 @@ const mapParameters = (parameters, filter) => {
     }
   } else {
     filter.where = mapWhereFilter(parameters.scope.where, parameters.relation);
+  }
+  return filter;
+};
+
+const mapTechniques = (techniques, filter) => {
+  if (filter.where) {
+    const scicatTechniques = mapWhereFilter(
+      techniques.scope.where,
+      techniques.relation,
+    );
+    if (filter.where.and) {
+      filter.where.and = filter.where.and.concat(scicatTechniques);
+    } else if (filter.where.or) {
+      filter.where.and = scicatTechniques.concat({or: filter.where.or});
+      delete filter.where.or;
+    } else {
+      filter.where = {and: scicatTechniques.concat(filter.where)};
+    }
+  } else {
+    filter.where = mapWhereFilter(techniques.scope.where, techniques.relation);
   }
   return filter;
 };

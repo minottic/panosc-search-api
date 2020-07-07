@@ -62,8 +62,8 @@ module.exports = class ResponseMapper {
         }
       }
       if (Object.keys(inclusions).includes('techniques')) {
-        dataset.techniques = scicatDataset.techniquesList
-          ? scicatDataset.techniquesList
+        dataset.techniques = scicatDataset.techniques
+          ? scicatDataset.techniques
           : [];
       }
     } catch (err) {
