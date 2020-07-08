@@ -5,6 +5,7 @@ const scicatInstrumentService = new ScicatService.Instrument();
 
 const filterMapper = require('../filter-mapper');
 const responseMapper = require('../response-mapper');
+const utils = require('../utils');
 
 module.exports = function (Instrument) {
   /**
@@ -51,4 +52,33 @@ module.exports = function (Instrument) {
   Instrument.count = async function (where) {
     return scicatInstrumentService.count(where);
   };
+
+  Instrument.afterRemote('find', (ctx, result, next) => {
+    const filter = ctx.args.filter ? ctx.args.filter : {};
+    const primaryRelations = utils.getPrimaryRelations(filter);
+    const secondaryRelations = utils.getSecondaryRelations(
+      primaryRelations,
+      filter,
+    );
+
+    if (primaryRelations.length > 0) {
+      primaryRelations.forEach((primary) => {
+        if (
+          secondaryRelations[primary] &&
+          secondaryRelations[primary].length > 0
+        ) {
+          secondaryRelations[primary].forEach((secondary) => {
+            ctx.result = utils.filterOnSecondary(
+              ctx.result,
+              primary,
+              secondary,
+            );
+          });
+        } else {
+          ctx.result = utils.filterOnPrimary(ctx.result, primary);
+        }
+      });
+    }
+    next();
+  });
 };
