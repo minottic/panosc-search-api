@@ -108,6 +108,11 @@ module.exports = function (Dataset) {
         }
       });
     }
+
+    ctx.result.forEach((instance) => {
+      instance.score = 0;
+    });
+
     next();
   });
 };

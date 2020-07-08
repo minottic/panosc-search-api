@@ -13,7 +13,6 @@ exports.dataset = async (scicatDataset, filter) => {
     isPublic: scicatDataset.isPublished,
     size: scicatDataset.size,
     creationDate: scicatDataset.creationTime,
-    score: 0,
   };
 
   console.log('>>> ResponseMapper.dataset default dataset', dataset);
@@ -101,7 +100,6 @@ exports.publishedData = async (scicatPublishedData, filter) => {
     title: scicatPublishedData.title,
     summary: scicatPublishedData.abstract,
     doi: scicatPublishedData.doi,
-    score: 0,
   };
 
   const inclusions = getInclusions(filter);
@@ -165,7 +163,6 @@ exports.instrument = (scicatInstrument) => {
         pid: scicatInstrument.pid,
         name: scicatInstrument.name,
         facility: 'ESS',
-        score: 0,
       }
     : {};
 };

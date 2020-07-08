@@ -81,6 +81,11 @@ module.exports = function (Document) {
         }
       });
     }
+
+    ctx.result.forEach((instance) => {
+      instance.score = 0;
+    });
+
     next();
   });
 };

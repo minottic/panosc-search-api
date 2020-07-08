@@ -79,6 +79,10 @@ module.exports = function (Instrument) {
         }
       });
     }
+    ctx.result.forEach((instance) => {
+      instance.score = 0;
+    });
+
     next();
   });
 };
