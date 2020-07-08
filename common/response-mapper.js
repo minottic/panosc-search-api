@@ -51,7 +51,23 @@ exports.dataset = async (scicatDataset, filter) => {
       const sampleId = scicatDataset.sampleId;
       if (sampleId) {
         const scicatSample = await scicatSampleService.findById(sampleId);
-        dataset.samples = [this.sample(scicatSample)];
+        if (inclusions.samples.where) {
+          const {where} = inclusions.samples;
+          if (where.and) {
+            // DO SOMETHING
+            dataset.samples = [];
+          } else if (where.or) {
+            // DO SOMETHING
+            dataset.samples = [];
+          } else {
+            dataset.samples =
+              where.name && where.name === scicatSample.description
+                ? [this.sample(scicatSample)]
+                : [];
+          }
+        } else {
+          dataset.samples = [this.sample(scicatSample)];
+        }
       } else {
         dataset.samples = [];
       }
