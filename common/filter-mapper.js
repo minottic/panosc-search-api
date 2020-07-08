@@ -214,13 +214,20 @@ const mapWhereFilter = (where, model) => {
         break;
       }
       case 'parameters': {
-        scicatWhere.and = [];
         const name = where.and.find((condition) =>
           Object.keys(condition).includes('name'),
-        )['name'];
+        )
+          ? where.and.find((condition) =>
+              Object.keys(condition).includes('name'),
+            )['name']
+          : null;
         const value = where.and.find((condition) =>
           Object.keys(condition).includes('value'),
-        )['value'];
+        )
+          ? where.and.find((condition) =>
+              Object.keys(condition).includes('value'),
+            )['value']
+          : null;
         const unit = where.and.find((condition) =>
           Object.keys(condition).includes('unit'),
         )
@@ -228,9 +235,20 @@ const mapWhereFilter = (where, model) => {
               Object.keys(condition).includes('unit'),
             )['unit']
           : null;
-        scicatWhere.and.push({[`scientificMetadata.${name}.value`]: value});
-        if (unit) {
-          scicatWhere.and.push({[`scientificMetadata.${name}.unit`]: unit});
+        if (name) {
+          scicatWhere.and = [];
+          if (value) {
+            scicatWhere.and.push({[`scientificMetadata.${name}.value`]: value});
+          }
+          if (unit) {
+            scicatWhere.and.push({[`scientificMetadata.${name}.unit`]: unit});
+          }
+        } else {
+          const err = new Error();
+          err.name = 'FilterError';
+          err.message = 'Parameter name was not provided';
+          err.statusCode = 400;
+          throw err;
         }
         break;
       }

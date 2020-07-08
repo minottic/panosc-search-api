@@ -16,7 +16,7 @@ class Dataset {
       const res = await superagent.get(url);
       return JSON.parse(res.text);
     } catch (err) {
-      return err;
+      throw err;
     }
   }
 
@@ -34,7 +34,7 @@ class Dataset {
       console.log('>>> Dataset.findById res.text', res.text);
       return JSON.parse(res.text);
     } catch (err) {
-      return err;
+      throw err;
     }
   }
 
@@ -49,7 +49,7 @@ class Dataset {
       const datasets = JSON.parse(res.text);
       return {count: datasets.length};
     } catch (err) {
-      return err;
+      throw err;
     }
   }
 
@@ -77,7 +77,7 @@ class Dataset {
       const res = await superagent.get(url);
       return JSON.parse(res.text)[0]['origdatablocks'];
     } catch (err) {
-      return err;
+      throw err;
     }
   }
 
@@ -103,7 +103,7 @@ class Dataset {
       const files = JSON.parse(res.text)[0]['origdatablocks'];
       return {count: files.length};
     } catch (err) {
-      return err;
+      throw err;
     }
   }
 }
@@ -121,7 +121,7 @@ class PublishedData {
       const res = await superagent.get(url);
       return JSON.parse(res.text);
     } catch (err) {
-      return err;
+      throw err;
     }
   }
 
@@ -135,7 +135,7 @@ class PublishedData {
       const res = await superagent.get(url);
       return JSON.parse(res.text);
     } catch (err) {
-      return err;
+      throw err;
     }
   }
 
@@ -148,7 +148,7 @@ class PublishedData {
       const res = await superagent.get(url);
       return JSON.parse(res.text);
     } catch (err) {
-      return err;
+      throw err;
     }
   }
 }
@@ -166,7 +166,7 @@ class Instrument {
       const res = await superagent.get(url);
       return JSON.parse(res.text);
     } catch (err) {
-      return err;
+      throw err;
     }
   }
 
@@ -180,7 +180,7 @@ class Instrument {
       const res = await superagent.get(url);
       return JSON.parse(res.text);
     } catch (err) {
-      return err;
+      throw err;
     }
   }
 
@@ -193,7 +193,7 @@ class Instrument {
       const res = await superagent.get(url);
       return JSON.parse(res.text);
     } catch (err) {
-      return err;
+      throw err;
     }
   }
 }
@@ -208,7 +208,7 @@ class Sample {
       const res = await superagent.get(url);
       return JSON.parse(res.text);
     } catch (err) {
-      return err;
+      throw err;
     }
   }
 }

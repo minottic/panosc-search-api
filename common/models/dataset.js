@@ -9,6 +9,9 @@ const filterMapper = new FilterMapper();
 const ResponseMapper = require('../response-mapper');
 const responseMapper = new ResponseMapper();
 
+const Utils = require('../utils');
+const utils = new Utils();
+
 module.exports = function (Dataset) {
   /**
    * Find all instances of the model matched by filter from the data source.
@@ -25,7 +28,7 @@ module.exports = function (Dataset) {
         ),
       );
     } catch (err) {
-      return err;
+      throw err;
     }
   };
 
@@ -42,7 +45,7 @@ module.exports = function (Dataset) {
       console.log('dataset before map', dataset);
       return await responseMapper.dataset(dataset, filter);
     } catch (err) {
-      return err;
+      throw err;
     }
   };
 
@@ -61,7 +64,7 @@ module.exports = function (Dataset) {
       );
       return responseMapper.files(origDatablocks);
     } catch (err) {
-      return err;
+      throw err;
     }
   };
 
@@ -83,4 +86,33 @@ module.exports = function (Dataset) {
   Dataset.countFiles = async function (id, where) {
     return scicatDatasetService.countFiles(id, where);
   };
+
+  Dataset.afterRemote('find', (ctx, result, next) => {
+    const filter = ctx.args.filter ? ctx.args.filter : {};
+    const primaryRelations = utils.getPrimaryRelations(filter);
+    const secondaryRelations = utils.getSecondaryRelations(
+      primaryRelations,
+      filter,
+    );
+
+    if (primaryRelations.length > 0) {
+      primaryRelations.forEach((primary) => {
+        if (
+          secondaryRelations[primary] &&
+          secondaryRelations[primary].length > 0
+        ) {
+          secondaryRelations[primary].forEach((secondary) => {
+            ctx.result = utils.filterOnSecondary(
+              ctx.result,
+              primary,
+              secondary,
+            );
+          });
+        } else {
+          ctx.result = utils.filterOnPrimary(ctx.result, primary);
+        }
+      });
+    }
+    next();
+  });
 };

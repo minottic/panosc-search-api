@@ -25,7 +25,7 @@ module.exports = function (Document) {
         ),
       );
     } catch (err) {
-      return err;
+      throw err;
     }
   };
 
@@ -44,7 +44,7 @@ module.exports = function (Document) {
       );
       return await responseMapper.publishedData(publishedData, filter);
     } catch (err) {
-      return err;
+      throw err;
     }
   };
 

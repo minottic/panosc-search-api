@@ -23,7 +23,7 @@ module.exports = function (Instrument) {
         responseMapper.instrument(instrument),
       );
     } catch (err) {
-      return err;
+      throw err;
     }
   };
 
@@ -42,7 +42,7 @@ module.exports = function (Instrument) {
       );
       return responseMapper.instrument(instrument);
     } catch (err) {
-      return err;
+      throw err;
     }
   };
 

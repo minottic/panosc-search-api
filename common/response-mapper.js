@@ -67,7 +67,7 @@ module.exports = class ResponseMapper {
           : [];
       }
     } catch (err) {
-      return err;
+      throw err;
     }
 
     console.log('>>> dataset', dataset);
@@ -126,7 +126,7 @@ module.exports = class ResponseMapper {
         );
       }
     } catch (err) {
-      return err;
+      throw err;
     }
     console.log('>>> document', document);
     return document;
@@ -152,12 +152,14 @@ module.exports = class ResponseMapper {
   }
 
   instrument(scicatInstrument) {
-    return {
-      pid: scicatInstrument.pid,
-      name: scicatInstrument.name,
-      facility: 'ESS',
-      score: 0,
-    };
+    return scicatInstrument.pid && scicatInstrument.name
+      ? {
+          pid: scicatInstrument.pid,
+          name: scicatInstrument.name,
+          facility: 'ESS',
+          score: 0,
+        }
+      : {};
   }
 
   members(scicatPublishedData, filter) {
