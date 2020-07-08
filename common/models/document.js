@@ -3,11 +3,8 @@
 const ScicatService = require('../scicat.service');
 const scicatPublishedDataService = new ScicatService.PublishedData();
 
-const FilterMapper = require('../filter-mapper');
-const filterMapper = new FilterMapper();
-
-const ResponseMapper = require('../response-mapper');
-const responseMapper = new ResponseMapper();
+const filterMapper = require('../filter-mapper');
+const responseMapper = require('../response-mapper');
 
 module.exports = function (Document) {
   /**

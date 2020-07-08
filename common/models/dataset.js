@@ -3,14 +3,9 @@
 const ScicatService = require('../scicat.service');
 const scicatDatasetService = new ScicatService.Dataset();
 
-const FilterMapper = require('../filter-mapper');
-const filterMapper = new FilterMapper();
-
-const ResponseMapper = require('../response-mapper');
-const responseMapper = new ResponseMapper();
-
-const Utils = require('../utils');
-const utils = new Utils();
+const filterMapper = require('../filter-mapper');
+const responseMapper = require('../response-mapper');
+const utils = require('../utils');
 
 module.exports = function (Dataset) {
   /**

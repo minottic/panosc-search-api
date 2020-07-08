@@ -1,147 +1,143 @@
 'use strict';
 
-module.exports = class FilterMapper {
-  constructor() {}
-
-  dataset(filter) {
-    if (!filter) {
-      return null;
-    } else {
-      let scicatFilter = {};
-      if (filter.where) {
-        scicatFilter.where = mapWhereFilter(filter.where, 'dataset');
-      }
-      if (filter.include) {
-        const parameters = filter.include.find(
-          (inclusion) => inclusion.relation === 'parameters',
-        );
-        if (parameters && parameters.scope && parameters.scope.where) {
-          scicatFilter = mapParameters(parameters, scicatFilter);
-        }
-        const techniques = filter.include.find(
-          (inclusion) => inclusion.relation === 'techniques',
-        );
-        if (techniques && techniques.scope && techniques.scope.where) {
-          scicatFilter = mapTechniques(techniques, scicatFilter);
-        }
-        const include = filter.include
-          .filter((inclusion) => inclusion.relation !== 'parameters')
-          .filter((inclusion) => inclusion.relation !== 'samples')
-          .filter((inclusion) => inclusion.relation !== 'techniques');
-        if (include.length > 0) {
-          scicatFilter.include = mapIncludeFilter(include);
-        }
-      }
-      if (filter.skip) {
-        scicatFilter.skip = filter.skip;
-      }
-      if (filter.limit) {
-        scicatFilter.limit = filter.limit;
-      }
-      return scicatFilter;
+exports.dataset = (filter) => {
+  if (!filter) {
+    return null;
+  } else {
+    let scicatFilter = {};
+    if (filter.where) {
+      scicatFilter.where = mapWhereFilter(filter.where, 'dataset');
     }
-  }
-
-  document(filter) {
-    if (!filter) {
-      return null;
-    } else {
-      let scicatFilter = {};
-      if (filter.where) {
-        if (filter.where.and) {
-          filter.where.and = filter.where.and
-            .filter((where) => !Object.keys(where).includes('isPublic'))
-            .filter((where) => !Object.keys(where).includes('type'));
-          if (filter.where.and.length > 0) {
-            scicatFilter.where = mapWhereFilter(filter.where, 'document');
-          }
-        } else if (filter.where.or) {
-          filter.where.or = filter.where.or
-            .filter((where) => !Object.keys(where).includes('isPublic'))
-            .filter((where) => !Object.keys(where).includes('type'));
-          if (filter.where.or.length > 0) {
-            scicatFilter.where = mapWhereFilter(filter.where, 'document');
-          }
-        } else {
-          delete filter.where.isPublic;
-          delete filter.where.type;
-          if (Object.keys(filter.where).length > 0) {
-            scicatFilter.where = mapWhereFilter(filter.where, 'document');
-          }
-        }
+    if (filter.include) {
+      const parameters = filter.include.find(
+        (inclusion) => inclusion.relation === 'parameters',
+      );
+      if (parameters && parameters.scope && parameters.scope.where) {
+        scicatFilter = mapParameters(parameters, scicatFilter);
       }
-      if (filter.include) {
-        const members = filter.include.find(
-          (inclusion) => inclusion.relation === 'members',
-        );
-        console.log('>>> document filter.include members', members);
-
-        if (members && members.scope) {
-          scicatFilter = mapMembers(members, scicatFilter);
-        }
-
-        const include = filter.include
-          .filter((inclusion) => inclusion.relation !== 'datasets')
-          .filter((inclusion) => inclusion.relation !== 'members');
-        if (include.length > 0) {
-          scicatFilter.include = mapIncludeFilter(include);
-        }
+      const techniques = filter.include.find(
+        (inclusion) => inclusion.relation === 'techniques',
+      );
+      if (techniques && techniques.scope && techniques.scope.where) {
+        scicatFilter = mapTechniques(techniques, scicatFilter);
       }
-      if (filter.skip) {
-        scicatFilter.skip = filter.skip;
+      const include = filter.include
+        .filter((inclusion) => inclusion.relation !== 'parameters')
+        .filter((inclusion) => inclusion.relation !== 'samples')
+        .filter((inclusion) => inclusion.relation !== 'techniques');
+      if (include.length > 0) {
+        scicatFilter.include = mapIncludeFilter(include);
       }
-      if (filter.limit) {
-        scicatFilter.limit = filter.limit;
-      }
-      return scicatFilter;
     }
-  }
-
-  files(filter) {
-    if (!filter) {
-      return null;
-    } else {
-      return filter;
+    if (filter.skip) {
+      scicatFilter.skip = filter.skip;
     }
+    if (filter.limit) {
+      scicatFilter.limit = filter.limit;
+    }
+    return scicatFilter;
   }
+};
 
-  instrument(filter) {
-    if (!filter) {
-      return null;
-    } else {
-      let scicatFilter = {};
-      if (filter.where) {
-        if (filter.where.and) {
-          filter.where.and = filter.where.and.filter(
-            (where) => !Object.keys(where).includes('facility'),
-          );
-        } else if (filter.where.or) {
-          filter.where.or = filter.where.or.filter(
-            (where) => !Object.keys(where).includes('facility'),
-          );
-        } else {
-          if (filter.where.facility) {
-            delete filter.where.facility;
-          }
+exports.document = (filter) => {
+  if (!filter) {
+    return null;
+  } else {
+    let scicatFilter = {};
+    if (filter.where) {
+      if (filter.where.and) {
+        filter.where.and = filter.where.and
+          .filter((where) => !Object.keys(where).includes('isPublic'))
+          .filter((where) => !Object.keys(where).includes('type'));
+        if (filter.where.and.length > 0) {
+          scicatFilter.where = mapWhereFilter(filter.where, 'document');
         }
-        if (Object.keys(filter.where).length > 0) {
-          scicatFilter.where = mapWhereFilter(filter.where, 'instrument');
+      } else if (filter.where.or) {
+        filter.where.or = filter.where.or
+          .filter((where) => !Object.keys(where).includes('isPublic'))
+          .filter((where) => !Object.keys(where).includes('type'));
+        if (filter.where.or.length > 0) {
+          scicatFilter.where = mapWhereFilter(filter.where, 'document');
         }
-      }
-      if (filter.include) {
-        scicatFilter.include = filter.include;
-      }
-      if (filter.skip) {
-        scicatFilter.skip = filter.skip;
-      }
-      if (filter.limit) {
-        scicatFilter.limit = filter.limit;
-      }
-      if (Object.keys(scicatFilter).length > 0) {
-        return scicatFilter;
       } else {
-        return null;
+        delete filter.where.isPublic;
+        delete filter.where.type;
+        if (Object.keys(filter.where).length > 0) {
+          scicatFilter.where = mapWhereFilter(filter.where, 'document');
+        }
       }
+    }
+    if (filter.include) {
+      const members = filter.include.find(
+        (inclusion) => inclusion.relation === 'members',
+      );
+      console.log('>>> document filter.include members', members);
+
+      if (members && members.scope) {
+        scicatFilter = mapMembers(members, scicatFilter);
+      }
+
+      const include = filter.include
+        .filter((inclusion) => inclusion.relation !== 'datasets')
+        .filter((inclusion) => inclusion.relation !== 'members');
+      if (include.length > 0) {
+        scicatFilter.include = mapIncludeFilter(include);
+      }
+    }
+    if (filter.skip) {
+      scicatFilter.skip = filter.skip;
+    }
+    if (filter.limit) {
+      scicatFilter.limit = filter.limit;
+    }
+    return scicatFilter;
+  }
+};
+
+exports.files = (filter) => {
+  if (!filter) {
+    return null;
+  } else {
+    return filter;
+  }
+};
+
+exports.instrument = (filter) => {
+  if (!filter) {
+    return null;
+  } else {
+    let scicatFilter = {};
+    if (filter.where) {
+      if (filter.where.and) {
+        filter.where.and = filter.where.and.filter(
+          (where) => !Object.keys(where).includes('facility'),
+        );
+      } else if (filter.where.or) {
+        filter.where.or = filter.where.or.filter(
+          (where) => !Object.keys(where).includes('facility'),
+        );
+      } else {
+        if (filter.where.facility) {
+          delete filter.where.facility;
+        }
+      }
+      if (Object.keys(filter.where).length > 0) {
+        scicatFilter.where = mapWhereFilter(filter.where, 'instrument');
+      }
+    }
+    if (filter.include) {
+      scicatFilter.include = filter.include;
+    }
+    if (filter.skip) {
+      scicatFilter.skip = filter.skip;
+    }
+    if (filter.limit) {
+      scicatFilter.limit = filter.limit;
+    }
+    if (Object.keys(scicatFilter).length > 0) {
+      return scicatFilter;
+    } else {
+      return null;
     }
   }
 };

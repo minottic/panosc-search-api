@@ -3,9 +3,7 @@
 const superagent = require('superagent');
 const baseUrl = 'http://localhost:3030/api/v3';
 
-class Dataset {
-  constructor() {}
-
+exports.Dataset = class {
   async find(filter) {
     try {
       console.log('>>> Dataset.find filter', JSON.stringify(filter));
@@ -106,11 +104,9 @@ class Dataset {
       throw err;
     }
   }
-}
+};
 
-class PublishedData {
-  constructor() {}
-
+exports.PublishedData = class {
   async find(filter) {
     try {
       const jsonFilter = JSON.stringify(filter);
@@ -151,11 +147,9 @@ class PublishedData {
       throw err;
     }
   }
-}
+};
 
-class Instrument {
-  constructor() {}
-
+exports.Instrument = class {
   async find(filter) {
     try {
       const jsonFilter = JSON.stringify(filter);
@@ -196,11 +190,9 @@ class Instrument {
       throw err;
     }
   }
-}
+};
 
-class Sample {
-  constructor() {}
-
+exports.Sample = class {
   async findById(id) {
     try {
       const encodedId = encodeURIComponent(id);
@@ -211,11 +203,4 @@ class Sample {
       throw err;
     }
   }
-}
-
-module.exports = {
-  Dataset: Dataset,
-  PublishedData: PublishedData,
-  Instrument: Instrument,
-  Sample: Sample,
 };
