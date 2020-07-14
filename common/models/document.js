@@ -1,6 +1,6 @@
 'use strict';
 
-const ScicatService = require('../scicat.service');
+const ScicatService = require('../scicat-service');
 const scicatPublishedDataService = new ScicatService.PublishedData();
 
 const filterMapper = require('../filter-mapper');

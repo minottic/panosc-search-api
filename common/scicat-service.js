@@ -29,7 +29,6 @@ exports.Dataset = class {
         : baseUrl + '/Datasets/' + encodedId;
       console.log('>>> Dataset.findById url', url);
       const res = await superagent.get(url);
-      console.log('>>> Dataset.findById res.text', res.text);
       return JSON.parse(res.text);
     } catch (err) {
       throw err;
@@ -193,6 +192,20 @@ exports.Instrument = class {
 };
 
 exports.Sample = class {
+  async find(filter) {
+    try {
+      const jsonFilter = JSON.stringify(filter);
+      console.log('>>> Sample.find filter', jsonFilter);
+      const url = jsonFilter
+        ? baseUrl + '/Samples?filter=' + jsonFilter
+        : baseUrl + '/Samples';
+      const res = await superagent.get(url);
+      return JSON.parse(res.text);
+    } catch (err) {
+      throw err;
+    }
+  }
+
   async findById(id) {
     try {
       const encodedId = encodeURIComponent(id);

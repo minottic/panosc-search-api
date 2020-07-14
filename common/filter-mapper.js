@@ -1,5 +1,7 @@
 'use strict';
 
+const mappings = require('./mappings');
+
 exports.dataset = (filter) => {
   if (!filter) {
     return null;
@@ -142,31 +144,16 @@ exports.instrument = (filter) => {
   }
 };
 
-const panoscToScicatDataset = {
-  pid: 'pid',
-  title: 'datasetName',
-  isPublic: 'isPublished',
-  size: 'size',
-  creationTime: 'creationDate',
-};
-
-const panoscToScicatDocument = {
-  pid: 'pid',
-  title: 'title',
-  summary: 'abstract',
-  doi: 'doi',
-};
-
-const panoscToScicatFile = {
-  id: 'id',
-  name: 'dataFileList.path',
-  path: 'dataFileList.path',
-  size: 'dataFileList.size',
-};
-
-const panoscToScicatTechniques = {
-  pid: 'techniques.pid',
-  name: 'techniques.name',
+exports.sample = (filter) => {
+  if (!filter) {
+    return null;
+  } else {
+    let scicatFilter = {};
+    if (filter.where) {
+      scicatFilter.where = mapWhereFilter(filter.where, 'samples');
+    }
+    return scicatFilter;
+  }
 };
 
 const mapWhereFilter = (where, model) => {
@@ -179,7 +166,7 @@ const mapWhereFilter = (where, model) => {
         scicatWhere.and = where.and.map((item) =>
           Object.assign(
             ...Object.keys(item).map((key) => ({
-              [panoscToScicatDataset[key]]: item[key],
+              [mappings.panoscToScicatDataset[key]]: item[key],
             })),
           ),
         );
@@ -189,7 +176,7 @@ const mapWhereFilter = (where, model) => {
         scicatWhere.and = where.and.map((item) =>
           Object.assign(
             ...Object.keys(item).map((key) => ({
-              [panoscToScicatDocument[key]]: item[key],
+              [mappings.panoscToScicatDocument[key]]: item[key],
             })),
           ),
         );
@@ -199,7 +186,7 @@ const mapWhereFilter = (where, model) => {
         scicatWhere.and = where.and.map((item) =>
           Object.assign(
             ...Object.keys(item).map((key) => ({
-              [panoscToScicatFile[key]]: item[key],
+              [mappings.panoscToScicatFile[key]]: item[key],
             })),
           ),
         );
@@ -248,11 +235,21 @@ const mapWhereFilter = (where, model) => {
         }
         break;
       }
+      case 'samples': {
+        scicatWhere.and = where.and.map((item) =>
+          Object.assign(
+            ...Object.keys(item).map((key) => ({
+              [mappings.panoscToScicatSample[key]]: item[key],
+            })),
+          ),
+        );
+        break;
+      }
       case 'techniques': {
         scicatWhere.and = where.and.map((item) =>
           Object.assign(
             ...Object.keys(item).map((key) => ({
-              [panoscToScicatTechniques[key]]: item[key],
+              [mappings.panoscToScicatTechniques[key]]: item[key],
             })),
           ),
         );
@@ -265,7 +262,7 @@ const mapWhereFilter = (where, model) => {
         scicatWhere.or = where.or.map((item) =>
           Object.assign(
             ...Object.keys(item).map((key) => ({
-              [panoscToScicatDataset[key]]: item[key],
+              [mappings.panoscToScicatDataset[key]]: item[key],
             })),
           ),
         );
@@ -275,7 +272,7 @@ const mapWhereFilter = (where, model) => {
         scicatWhere.or = where.or.map((item) =>
           Object.assign(
             ...Object.keys(item).map((key) => ({
-              [panoscToScicatDocument[key]]: item[key],
+              [mappings.panoscToScicatDocument[key]]: item[key],
             })),
           ),
         );
@@ -289,7 +286,17 @@ const mapWhereFilter = (where, model) => {
         scicatWhere.or = where.or.map((item) =>
           Object.assign(
             ...Object.keys(item).map((key) => ({
-              [panoscToScicatFile[key]]: item[key],
+              [mappings.panoscToScicatFile[key]]: item[key],
+            })),
+          ),
+        );
+        break;
+      }
+      case 'samples': {
+        scicatWhere.or = where.or.map((item) =>
+          Object.assign(
+            ...Object.keys(item).map((key) => ({
+              [mappings.panoscToScicatSample[key]]: item[key],
             })),
           ),
         );
@@ -299,7 +306,7 @@ const mapWhereFilter = (where, model) => {
         scicatWhere.or = where.or.map((item) =>
           Object.assign(
             ...Object.keys(item).map((key) => ({
-              [panoscToScicatTechniques[key]]: item[key],
+              [mappings.panoscToScicatTechniques[key]]: item[key],
             })),
           ),
         );
@@ -311,7 +318,7 @@ const mapWhereFilter = (where, model) => {
       case 'dataset': {
         scicatWhere = Object.assign(
           ...Object.keys(where).map((key) => ({
-            [panoscToScicatDataset[key]]: where[key],
+            [mappings.panoscToScicatDataset[key]]: where[key],
           })),
         );
         break;
@@ -319,7 +326,7 @@ const mapWhereFilter = (where, model) => {
       case 'document': {
         scicatWhere = Object.assign(
           ...Object.keys(where).map((key) => ({
-            [panoscToScicatDocument[key]]: where[key],
+            [mappings.panoscToScicatDocument[key]]: where[key],
           })),
         );
         break;
@@ -327,7 +334,7 @@ const mapWhereFilter = (where, model) => {
       case 'files': {
         scicatWhere = Object.assign(
           ...Object.keys(where).map((key) => ({
-            [panoscToScicatFile[key]]: where[key],
+            [mappings.panoscToScicatFile[key]]: where[key],
           })),
         );
         break;
@@ -347,10 +354,18 @@ const mapWhereFilter = (where, model) => {
         ];
         break;
       }
+      case 'samples': {
+        scicatWhere = Object.assign(
+          ...Object.keys(where).map((key) => ({
+            [mappings.panoscToScicatSample[key]]: where[key],
+          })),
+        );
+        break;
+      }
       case 'techniques': {
         scicatWhere = Object.assign(
           ...Object.keys(where).map((key) => ({
-            [panoscToScicatTechniques[key]]: where[key],
+            [mappings.panoscToScicatTechniques[key]]: where[key],
           })),
         );
         break;

@@ -78,18 +78,18 @@ exports.filterOnSecondary = (result, primary, secondary) =>
           item[primary].filter((child) =>
             Array.isArray(child[secondary])
               ? child[secondary].length > 0
-              : Object.keys(child).includes(secondary),
+              : Object.keys(child[secondary]).length > 0,
           ).length > 0
             ? item[primary].filter((child) =>
                 Array.isArray(child[secondary])
                   ? child[secondary].length > 0
-                  : Object.keys(child).includes(secondary),
+                  : Object.keys(child[secondary]).length > 0,
               )
             : null)
-      : Object.keys(item).includes(primary) &&
+      : Object.keys(item[primary]).length > 0 &&
         item[primary].filter((child) =>
           Array.isArray(child[secondary])
             ? child[secondary].length > 0
-            : Object.keys(child).includes(secondary),
+            : Object.keys(child[secondary]).length > 0,
         ).length > 0,
   );
