@@ -52,7 +52,12 @@ module.exports = function (Document) {
    */
 
   Document.count = async function (where) {
-    return scicatPublishedDataService.count(where);
+    try {
+      const scicatFilter = filterMapper.document({where});
+      return await scicatPublishedDataService.count(scicatFilter.where);
+    } catch (err) {
+      throw err;
+    }
   };
 
   Document.afterRemote('find', (ctx, result, next) => {

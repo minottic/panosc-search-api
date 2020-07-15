@@ -54,6 +54,7 @@ exports.Dataset = class {
     try {
       const encodedId = encodeURIComponent(id);
       const jsonFilter = JSON.stringify(filter);
+      console.log('>>> Dataset.findByIdFiles pid', encodedId);
       console.log('>>> Dataset.findByIdFiles filter', jsonFilter);
       const url = jsonFilter
         ? baseUrl + '/Datasets/' + encodedId + '?filter=' + jsonFilter
@@ -85,6 +86,8 @@ exports.PublishedData = class {
     try {
       const encodedId = encodeURIComponent(id);
       const jsonFilter = JSON.stringify(filter);
+      console.log('>>> PublishedData.findById pid', encodedId);
+      console.log('>>> PublishedData.findById filter', jsonFilter);
       const url = jsonFilter
         ? baseUrl + '/PublishedData/' + encodedId + '?filter=' + jsonFilter
         : baseUrl + '/PublishedData/' + encodedId;
@@ -98,6 +101,7 @@ exports.PublishedData = class {
   async count(where) {
     try {
       const jsonWhere = JSON.stringify(where);
+      console.log('>>> PublishedData.count where', jsonWhere);
       const url = jsonWhere
         ? baseUrl + '/PublishedData/count?where=' + jsonWhere
         : baseUrl + '/PublishedData/count';
