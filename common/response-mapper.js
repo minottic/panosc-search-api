@@ -7,6 +7,13 @@ const scicatDatasetService = new ScicatService.Dataset();
 const scicatPublishedDataService = new ScicatService.PublishedData();
 const scicatSampleService = new ScicatService.Sample();
 
+/**
+ * Map a SciCat dataset to a PaNOSC dataset
+ * @param {object} scicatDataset Scicat dataset object
+ * @param {object} filter PaNOSC loopback filter object
+ * @returns {object} PaNOSC dataset object
+ */
+
 exports.dataset = async (scicatDataset, filter) => {
   const dataset = {
     pid: scicatDataset.pid,
@@ -26,10 +33,7 @@ exports.dataset = async (scicatDataset, filter) => {
       );
       dataset.document =
         scicatPublishedData.length > 0
-          ? await this.publishedData(
-              scicatPublishedData[0],
-              inclusions.document,
-            )
+          ? await this.document(scicatPublishedData[0], inclusions.document)
           : {};
     }
     if (Object.keys(inclusions).includes('files')) {
@@ -91,31 +95,14 @@ exports.dataset = async (scicatDataset, filter) => {
   return dataset;
 };
 
-exports.parameters = (scientificMetadata, filter) => {
-  const parameter = utils.extractParamaterFilter(filter.where);
-  return Object.keys(scientificMetadata).map((key) => {
-    if (key === parameter.name) {
-      const {value, unit} = utils.convertToUnit(
-        scientificMetadata[key].value,
-        scientificMetadata[key].unit,
-        parameter.unit,
-      );
-      return {
-        name: key,
-        value,
-        unit,
-      };
-    } else {
-      return {
-        name: key,
-        value: scientificMetadata[key].value,
-        unit: scientificMetadata[key].unit,
-      };
-    }
-  });
-};
+/**
+ * Map a SciCat publication to a PaNOSC document
+ * @param {object} scicatPublishedData SciCat publishedData object
+ * @param {object} filter PaNOSC loopback filter object
+ * @returns {object} PaNOSC document object
+ */
 
-exports.publishedData = async (scicatPublishedData, filter) => {
+exports.document = async (scicatPublishedData, filter) => {
   const document = {
     pid: scicatPublishedData.doi,
     isPublic: true,
@@ -176,6 +163,12 @@ exports.publishedData = async (scicatPublishedData, filter) => {
   return document;
 };
 
+/**
+ * Map an array of SciCat origDatablocks to an array of PaNOSC files
+ * @param {array} scicatOrigDatablocks Array of SciCat origDatablock objects
+ * @returns {array} Array of PaNOSC file objects
+ */
+
 exports.files = (scicatOrigDatablocks) => {
   return [].concat.apply(
     [],
@@ -195,6 +188,12 @@ exports.files = (scicatOrigDatablocks) => {
   );
 };
 
+/**
+ * Map a SciCat instrument to a PaNOSC instrument
+ * @param {object} scicatInstrument SciCat instrument object
+ * @returns {object} PaNOSC instrument object
+ */
+
 exports.instrument = (scicatInstrument) => {
   return scicatInstrument.pid && scicatInstrument.name
     ? {
@@ -204,6 +203,13 @@ exports.instrument = (scicatInstrument) => {
       }
     : {};
 };
+
+/**
+ * Map SciCat publication members to PaNOSC members
+ * @param {object} scicatPublishedData SciCat publishedData object
+ * @param {object} filter PaNOSC loopback filter object
+ * @returns {array} Array of PaNOSC members
+ */
 
 exports.members = (scicatPublishedData, filter) => {
   const inclusions = filter.include
@@ -229,6 +235,43 @@ exports.members = (scicatPublishedData, filter) => {
       : [];
   return creators.concat(authors);
 };
+
+/**
+ * Map SciCat scientificMetadata to PaNOSC parameters
+ * @param {object} scientificMetadata SciCat scientificMetadata object
+ * @param {object} filter PaNOSC loopback filter object
+ * @returns {array} Array of PaNOSC parameter objects
+ */
+
+exports.parameters = (scientificMetadata, filter) => {
+  const parameter = utils.extractParamaterFilter(filter.where);
+  return Object.keys(scientificMetadata).map((key) => {
+    if (key === parameter.name) {
+      const {value, unit} = utils.convertToUnit(
+        scientificMetadata[key].value,
+        scientificMetadata[key].unit,
+        parameter.unit,
+      );
+      return {
+        name: key,
+        value,
+        unit,
+      };
+    } else {
+      return {
+        name: key,
+        value: scientificMetadata[key].value,
+        unit: scientificMetadata[key].unit,
+      };
+    }
+  });
+};
+
+/**
+ * Map SciCat sample to PaNOSC sample
+ * @param {object} scicatSample SciCat sample object
+ * @returns {object} PaNOSC sample object
+ */
 
 exports.sample = (scicatSample) => {
   return {

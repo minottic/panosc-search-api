@@ -19,7 +19,7 @@ module.exports = function (Document) {
       const publishedData = await scicatPublishedDataService.find(scicatFilter);
       return await Promise.all(
         publishedData.map(
-          async (data) => await responseMapper.publishedData(data, filter),
+          async (data) => await responseMapper.document(data, filter),
         ),
       );
     } catch (err) {
@@ -40,7 +40,7 @@ module.exports = function (Document) {
         id,
         scicatFilter,
       );
-      return await responseMapper.publishedData(publishedData, filter);
+      return await responseMapper.document(publishedData, filter);
     } catch (err) {
       throw err;
     }
