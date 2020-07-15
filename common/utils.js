@@ -103,6 +103,14 @@ exports.convertToSI = (value, unit) => {
   return {valueSI: Number(convertedValue), unitSI: convertedUnit};
 };
 
+exports.convertToUnit = (value, unit, toUnit) => {
+  const converted = math.unit(value, unit).to(toUnit);
+  const formatted = math.format(converted, {precision: 3}).toString();
+  const formattedValue = formatted.substring(0, formatted.indexOf(' '));
+  const formattedUnit = formatted.substring(formatted.indexOf(' ') + 1);
+  return {value: Number(formattedValue), unit: formattedUnit};
+};
+
 exports.extractParamater = (where) => {
   const name = where.and.find((condition) =>
     Object.keys(condition).includes('name'),

@@ -2,6 +2,7 @@
 
 const filterMapper = require('./filter-mapper');
 const ScicatService = require('./scicat-service');
+const {extractParamater, convertToUnit} = require('./utils');
 const scicatDatasetService = new ScicatService.Dataset();
 const scicatPublishedDataService = new ScicatService.PublishedData();
 const scicatSampleService = new ScicatService.Sample();
@@ -43,7 +44,10 @@ exports.dataset = async (scicatDataset, filter) => {
     }
     if (Object.keys(inclusions).includes('parameters')) {
       dataset.parameters = scicatDataset.scientificMetadata
-        ? this.parameters(scicatDataset.scientificMetadata)
+        ? this.parameters(
+            scicatDataset.scientificMetadata,
+            inclusions.parameters,
+          )
         : [];
     }
     if (Object.keys(inclusions).includes('samples')) {
@@ -94,12 +98,28 @@ exports.dataset = async (scicatDataset, filter) => {
   return dataset;
 };
 
-exports.parameters = (scientificMetadata) => {
-  return Object.keys(scientificMetadata).map((key) => ({
-    name: key,
-    value: scientificMetadata[key].value,
-    unit: scientificMetadata[key].unit,
-  }));
+exports.parameters = (scientificMetadata, filter) => {
+  const parameter = extractParamater(filter.where);
+  return Object.keys(scientificMetadata).map((key) => {
+    if (key === parameter.name) {
+      const {value, unit} = convertToUnit(
+        scientificMetadata[key].value,
+        scientificMetadata[key].unit,
+        parameter.unit,
+      );
+      return {
+        name: key,
+        value,
+        unit,
+      };
+    } else {
+      return {
+        name: key,
+        value: scientificMetadata[key].value,
+        unit: scientificMetadata[key].unit,
+      };
+    }
+  });
 };
 
 exports.publishedData = async (scicatPublishedData, filter) => {
