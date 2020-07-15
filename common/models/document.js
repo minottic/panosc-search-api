@@ -62,19 +62,12 @@ module.exports = function (Document) {
 
   Document.afterRemote('find', (ctx, result, next) => {
     const filter = ctx.args.filter ? ctx.args.filter : {};
-    const primaryRelations = utils.getPrimaryRelations(filter);
-    const secondaryRelations = utils.getSecondaryRelations(
-      primaryRelations,
-      filter,
-    );
+    const inclusions = utils.getInclusionNames(filter);
 
-    if (primaryRelations.length > 0) {
-      primaryRelations.forEach((primary) => {
-        if (
-          secondaryRelations[primary] &&
-          secondaryRelations[primary].length > 0
-        ) {
-          secondaryRelations[primary].forEach((secondary) => {
+    if (Object.keys(inclusions).length > 0) {
+      Object.keys(inclusions).forEach((primary) => {
+        if (inclusions[primary] && inclusions[primary].length > 0) {
+          inclusions[primary].forEach((secondary) => {
             ctx.result = utils.filterOnSecondary(
               ctx.result,
               primary,

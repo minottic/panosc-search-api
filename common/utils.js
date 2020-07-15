@@ -3,51 +3,48 @@
 const math = require('mathjs');
 
 /**
- * Get primary relations from filter
- * @param {string} filter LoopBack filter object
- * @returns {string[]} Array of primary relations
+ * Get inclusions from filter
+ * @param {object} filter Loopback filter object
+ * @returns {object} Object with primary relation as key and loopback filter object as value
  */
 
-exports.getPrimaryRelations = (filter) =>
-  filter.include
-    ? filter.include
-        .filter(
-          (primary) =>
-            (primary.scope && primary.scope.where) ||
-            (primary.scope && primary.scope.include),
-        )
-        .map(({relation}) => relation)
-    : [];
+exports.getInclusions = (filter) =>
+  filter && filter.include
+    ? Object.assign(
+        ...filter.include.map((inclusion) =>
+          inclusion.scope
+            ? {[inclusion.relation]: inclusion.scope}
+            : {[inclusion.relation]: {}},
+        ),
+      )
+    : {};
 
 /**
- * Get secondary relations from filter
- * @param {string[]} primaryRelations Array of primary relations
- * @param {string} filter LoopBack filter object
+ * Get names of inclusions from filter
+ * @param {object} filter LoopBack filter object
  * @returns {object} Object with primary relation as key and and an array of secondary relations as value
  */
 
-exports.getSecondaryRelations = (primaryRelations, filter) =>
-  primaryRelations.length > 0 &&
-  filter.include.filter(
-    (inclusion) => inclusion.scope && inclusion.scope.include,
-  ).length > 0
+exports.getInclusionNames = (filter) =>
+  filter && filter.include
     ? Object.assign(
-        ...primaryRelations.map((primary) => ({
-          [primary]: [].concat.apply(
-            [],
-            filter.include.map((inclusion) =>
-              inclusion.relation === primary &&
-              inclusion.scope &&
-              inclusion.scope.include
-                ? inclusion.scope.include
+        ...filter.include
+          .filter(
+            (primary) =>
+              (primary.scope && primary.scope.where) ||
+              (primary.scope && primary.scope.include),
+          )
+          .map((inclusion) =>
+            inclusion.scope && inclusion.scope.include
+              ? {
+                  [inclusion.relation]: inclusion.scope.include
                     .filter(
                       (secondary) => secondary.scope && secondary.scope.where,
                     )
-                    .map(({relation}) => relation)
-                : [],
-            ),
+                    .map(({relation}) => relation),
+                }
+              : {[inclusion.relation]: []},
           ),
-        })),
       )
     : {};
 
@@ -96,16 +93,12 @@ exports.filterOnSecondary = (result, primary, secondary) =>
         ).length > 0,
   );
 
-exports.getInclusions = (filter) =>
-  filter && filter.include
-    ? Object.assign(
-        ...filter.include.map((inclusion) =>
-          inclusion.scope
-            ? {[inclusion.relation]: inclusion.scope}
-            : {[inclusion.relation]: {}},
-        ),
-      )
-    : {};
+/**
+ * Convert a quantity to SI units
+ * @param {number} value Value to be converted
+ * @param {string} unit Unit to be converted
+ * @returns {object} Object with with the converted value as `valueSI` and the converted unit as `unitSI`
+ */
 
 exports.convertToSI = (value, unit) => {
   const quantity = math.unit(value, unit).toSI().toString();
@@ -114,6 +107,14 @@ exports.convertToSI = (value, unit) => {
   return {valueSI: Number(convertedValue), unitSI: convertedUnit};
 };
 
+/**
+ * Convert a quantity to another unit
+ * @param {number} value Value to be converted
+ * @param {string} unit Unit to be converted
+ * @param {string} toUnit Unit the quantity should be converted to
+ * @returns {object} Object with the converted value and unit
+ */
+
 exports.convertToUnit = (value, unit, toUnit) => {
   const converted = math.unit(value, unit).to(toUnit);
   const formatted = math.format(converted, {precision: 3}).toString();
@@ -121,6 +122,12 @@ exports.convertToUnit = (value, unit, toUnit) => {
   const formattedUnit = formatted.substring(formatted.indexOf(' ') + 1);
   return {value: Number(formattedValue), unit: formattedUnit};
 };
+
+/**
+ * Extracts the name, value and unit from parameter where filter
+ * @param {object} where Parameter where filter object
+ * @returns {object} Object with the extracted name, value and unit
+ */
 
 exports.extractParamaterFilter = (where) => {
   if (where && where.and) {
