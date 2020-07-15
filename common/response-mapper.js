@@ -181,6 +181,9 @@ exports.publishedData = async (scicatPublishedData, filter) => {
     if (Object.keys(inclusions).includes('members')) {
       document.members = this.members(scicatPublishedData, inclusions.members);
     }
+    if (Object.keys(inclusions).includes('parameters')) {
+      document.parameters = [];
+    }
   } catch (err) {
     throw err;
   }

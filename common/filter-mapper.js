@@ -98,11 +98,20 @@ exports.document = (filter) => {
 };
 
 exports.files = (filter) => {
+  console.log('>>> FilterMapper.files filter', filter);
+  let scicatFilter = {};
   if (!filter) {
-    return null;
+    scicatFilter.include = [{relation: 'origdatablocks'}];
   } else {
-    return filter;
+    if (filter.where && filter.where !== undefined) {
+      scicatFilter.include = [
+        {relation: 'origdatablocks', scope: {where: filter.where}},
+      ];
+    } else {
+      scicatFilter.include = [{relation: 'origdatablocks'}];
+    }
   }
+  return scicatFilter;
 };
 
 exports.instrument = (filter) => {

@@ -1,13 +1,14 @@
 'use strict';
 
 const superagent = require('superagent');
+
 const baseUrl = process.env.BASE_URL || 'http://localhost:3030/api/v3';
 
 exports.Dataset = class {
   async find(filter) {
     try {
-      console.log('>>> Dataset.find filter', JSON.stringify(filter));
       const jsonFilter = JSON.stringify(filter);
+      console.log('>>> Dataset.find filter', jsonFilter);
       const url = jsonFilter
         ? baseUrl + '/Datasets?filter=' + jsonFilter
         : baseUrl + '/Datasets';
@@ -24,10 +25,9 @@ exports.Dataset = class {
       const jsonFilter = JSON.stringify(filter);
       console.log('>>> Dataset.findById pid', encodedId);
       console.log('>>> Dataset.findById filter', jsonFilter);
-      const url = filter
+      const url = jsonFilter
         ? baseUrl + '/Datasets/' + encodedId + '?filter=' + jsonFilter
         : baseUrl + '/Datasets/' + encodedId;
-      console.log('>>> Dataset.findById url', url);
       const res = await superagent.get(url);
       return JSON.parse(res.text);
     } catch (err) {
@@ -35,10 +35,10 @@ exports.Dataset = class {
     }
   }
 
-  async count(where) {
+  async count(filter) {
     try {
-      console.log('>>> COUNT FILTER', {where});
-      const jsonFilter = JSON.stringify({where});
+      const jsonFilter = JSON.stringify(filter);
+      console.log('>>> Dataset.count filter', jsonFilter);
       const url = jsonFilter
         ? baseUrl + '/Datasets?filter=' + jsonFilter
         : baseUrl + '/Datasets';
@@ -52,53 +52,14 @@ exports.Dataset = class {
 
   async findByIdFiles(id, filter) {
     try {
-      if (!filter) {
-        filter = {where: {pid: id}, include: [{relation: 'origdatablocks'}]};
-      } else {
-        if (!filter.where) {
-          filter.where = {pid: id};
-        } else {
-          filter.where['pid'] = id;
-        }
-        if (!filter.include) {
-          filter.include = [{relation: 'origdatablocks'}];
-        } else {
-          filter.include.push({relation: 'origdatablocks'});
-        }
-      }
-      console.log('>>> FINDBYIDFILES FILTER', filter);
+      const encodedId = encodeURIComponent(id);
       const jsonFilter = JSON.stringify(filter);
+      console.log('>>> Dataset.findByIdFiles filter', jsonFilter);
       const url = jsonFilter
-        ? baseUrl + '/Datasets?filter=' + jsonFilter
-        : baseUrl + '/Datasets';
+        ? baseUrl + '/Datasets/' + encodedId + '?filter=' + jsonFilter
+        : baseUrl + '/Datasets/' + encodedId;
       const res = await superagent.get(url);
-      return JSON.parse(res.text)[0]['origdatablocks'];
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  async countFiles(id, where) {
-    try {
-      const filter = {where};
-      if (!filter) {
-        filter = {where: {pid: id}};
-      } else {
-        if (!filter.where) {
-          filter.where = {pid: id};
-        } else {
-          filter.where['pid'] = id;
-        }
-      }
-      filter.include = [{relation: 'origdatablocks'}];
-      console.log('>>> COUNTFILES FILTER', filter);
-      const jsonFilter = JSON.stringify(filter);
-      const url = jsonFilter
-        ? baseUrl + '/Datasets?filter=' + jsonFilter
-        : baseUrl + '/Datasets';
-      const res = await superagent.get(url);
-      const files = JSON.parse(res.text)[0]['origdatablocks'];
-      return {count: files.length};
+      return JSON.parse(res.text)['origdatablocks'];
     } catch (err) {
       throw err;
     }

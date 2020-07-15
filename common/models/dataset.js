@@ -45,6 +45,20 @@ module.exports = function (Dataset) {
   };
 
   /**
+   * Count instances of the model matched by where from the data source.
+   * @param {object} where Criteria to match model instances
+   */
+
+  Dataset.count = async function (where) {
+    try {
+      const scicatFilter = filterMapper.dataset({where});
+      return await scicatDatasetService.count(scicatFilter);
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  /**
    * Queries files of Dataset.
    * @param {string} id Dataset id
    * @param {object} filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({"where":{"something":"value"}}). See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
@@ -64,22 +78,23 @@ module.exports = function (Dataset) {
   };
 
   /**
-   * Count instances of the model matched by where from the data source.
-   * @param {object} where Criteria to match model instances
-   */
-
-  Dataset.count = async function (where) {
-    return scicatDatasetService.count(where);
-  };
-
-  /**
    * Counts files of Dataset.
    * @param {string} id Dataset id
    * @param {object} where Criteria to match model instances
    */
 
   Dataset.countFiles = async function (id, where) {
-    return scicatDatasetService.countFiles(id, where);
+    try {
+      const scicatFilter = filterMapper.files({where});
+      const origDatablocks = await scicatDatasetService.findByIdFiles(
+        id,
+        scicatFilter,
+      );
+      const files = responseMapper.files(origDatablocks);
+      return {count: files.length};
+    } catch (err) {
+      throw err;
+    }
   };
 
   Dataset.afterRemote('find', (ctx, result, next) => {

@@ -335,8 +335,9 @@ describe('Document', () => {
 
   describe('GET /documents/{id}', () => {
     it('should return the document with the requested pid', (done) => {
+      const pid = '10.5072/c0186551-518e-4d17-99fc-16140ed06f8f';
       request(app)
-        .get(requestUrl + '/' + encodeURIComponent('10.5072/panosc-document1'))
+        .get(requestUrl + '/' + encodeURIComponent(pid))
         .set('Accept', 'application/json')
         .expect(200)
         .expect('Content-Type', /json/)
@@ -344,7 +345,7 @@ describe('Document', () => {
           if (err) throw err;
 
           expect(res.body).to.have.property('pid');
-          expect(res.body['pid']).to.equal('10.5072/panosc-document1');
+          expect(res.body['pid']).to.equal(pid);
           expect(res.body).to.have.property('isPublic');
           expect(res.body).to.have.property('type');
           expect(res.body).to.have.property('title');

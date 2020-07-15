@@ -97,14 +97,9 @@ describe('Instrument', () => {
 
   describe('GET /instruments/{id}', () => {
     it('should return the instrument with the requested pid', (done) => {
+      const pid = '125e8172-d0f4-4547-98be-a9db903a6269';
       request(app)
-        .get(
-          requestUrl +
-            '/' +
-            encodeURIComponent(
-              '20.500.12269/0f98fcf2-7bd7-430e-ad20-d47031ca8f71',
-            ),
-        )
+        .get(requestUrl + '/' + encodeURIComponent(pid))
         .set('Accept', 'application/json')
         .expect(200)
         .expect('Content-Type', /json/)
@@ -112,9 +107,7 @@ describe('Instrument', () => {
           if (err) throw err;
 
           expect(res.body).to.have.property('pid');
-          expect(res.body['pid']).to.equal(
-            '20.500.12269/0f98fcf2-7bd7-430e-ad20-d47031ca8f71',
-          );
+          expect(res.body['pid']).to.equal(pid);
           expect(res.body).to.have.property('name');
           expect(res.body).to.have.property('facility');
           done();

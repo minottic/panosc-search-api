@@ -300,10 +300,9 @@ describe('Dataset', () => {
 
   describe('GET /datasets/{id}', () => {
     it('should return the dataset with the requested id', (done) => {
+      const pid = '20.500.12269/cbe31b45-d7b6-4446-a516-6aae99950517';
       request(app)
-        .get(
-          requestUrl + '/' + encodeURIComponent('20.500.12269/panosc-dataset1'),
-        )
+        .get(requestUrl + '/' + encodeURIComponent(pid))
         .set('Accept', 'application/json')
         .expect(200)
         .expect('Content-Type', /json/)
@@ -311,7 +310,7 @@ describe('Dataset', () => {
           if (err) throw err;
 
           expect(res.body).to.have.property('pid');
-          expect(res.body['pid']).to.equal('20.500.12269/panosc-dataset1');
+          expect(res.body['pid']).to.equal(pid);
           expect(res.body).to.have.property('title');
           expect(res.body).to.have.property('isPublic');
           expect(res.body).to.have.property('creationDate');
