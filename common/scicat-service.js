@@ -118,7 +118,7 @@ exports.Instrument = class {
     try {
       const jsonFilter = JSON.stringify(filter);
       console.log('>>> Instrument.find filter', jsonFilter);
-      const url = filter
+      const url = jsonFilter
         ? baseUrl + '/Instruments?filter=' + jsonFilter
         : baseUrl + '/Instruments';
       const res = await superagent.get(url);
@@ -132,6 +132,8 @@ exports.Instrument = class {
     try {
       const encodedId = encodeURIComponent(id);
       const jsonFilter = JSON.stringify(filter);
+      console.log('>>> Instrument.findById id', encodedId);
+      console.log('>>> Instrument.findById filter', jsonFilter);
       const url = jsonFilter
         ? baseUrl + '/Instruments/' + encodedId + '?filter=' + jsonFilter
         : baseUrl + '/Instruments/' + encodedId;
@@ -145,6 +147,7 @@ exports.Instrument = class {
   async count(where) {
     try {
       const jsonWhere = JSON.stringify(where);
+      console.log('>>> Instrument.count where', jsonWhere);
       const url = jsonWhere
         ? baseUrl + '/Instruments/count?where=' + jsonWhere
         : baseUrl + '/Instruments/count';
@@ -164,17 +167,6 @@ exports.Sample = class {
       const url = jsonFilter
         ? baseUrl + '/Samples?filter=' + jsonFilter
         : baseUrl + '/Samples';
-      const res = await superagent.get(url);
-      return JSON.parse(res.text);
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  async findById(id) {
-    try {
-      const encodedId = encodeURIComponent(id);
-      const url = baseUrl + '/Samples/' + encodedId;
       const res = await superagent.get(url);
       return JSON.parse(res.text);
     } catch (err) {

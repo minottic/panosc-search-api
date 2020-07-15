@@ -50,7 +50,12 @@ module.exports = function (Instrument) {
    */
 
   Instrument.count = async function (where) {
-    return scicatInstrumentService.count(where);
+    try {
+      const scicatFilter = filterMapper.instrument({where});
+      return await scicatInstrumentService.count(scicatFilter.where);
+    } catch (err) {
+      throw err;
+    }
   };
 
   Instrument.afterRemote('find', (ctx, result, next) => {

@@ -146,11 +146,7 @@ exports.instrument = (filter) => {
     if (filter.limit) {
       scicatFilter.limit = filter.limit;
     }
-    if (Object.keys(scicatFilter).length > 0) {
-      return scicatFilter;
-    } else {
-      return null;
-    }
+    return scicatFilter;
   }
 };
 
