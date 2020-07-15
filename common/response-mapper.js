@@ -1,8 +1,8 @@
 'use strict';
 
 const filterMapper = require('./filter-mapper');
+const utils = require('./utils');
 const ScicatService = require('./scicat-service');
-const {extractParamater, convertToUnit} = require('./utils');
 const scicatDatasetService = new ScicatService.Dataset();
 const scicatPublishedDataService = new ScicatService.PublishedData();
 const scicatSampleService = new ScicatService.Sample();
@@ -99,10 +99,10 @@ exports.dataset = async (scicatDataset, filter) => {
 };
 
 exports.parameters = (scientificMetadata, filter) => {
-  const parameter = extractParamater(filter.where);
+  const parameter = utils.extractParamaterFilter(filter.where);
   return Object.keys(scientificMetadata).map((key) => {
     if (key === parameter.name) {
-      const {value, unit} = convertToUnit(
+      const {value, unit} = utils.convertToUnit(
         scientificMetadata[key].value,
         scientificMetadata[key].unit,
         parameter.unit,

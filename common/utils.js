@@ -111,27 +111,31 @@ exports.convertToUnit = (value, unit, toUnit) => {
   return {value: Number(formattedValue), unit: formattedUnit};
 };
 
-exports.extractParamater = (where) => {
-  const name = where.and.find((condition) =>
-    Object.keys(condition).includes('name'),
-  )
-    ? where.and.find((condition) => Object.keys(condition).includes('name'))[
-        'name'
-      ]
-    : null;
-  const value = where.and.find((condition) =>
-    Object.keys(condition).includes('value'),
-  )
-    ? where.and.find((condition) => Object.keys(condition).includes('value'))[
-        'value'
-      ]
-    : null;
-  const unit = where.and.find((condition) =>
-    Object.keys(condition).includes('unit'),
-  )
-    ? where.and.find((condition) => Object.keys(condition).includes('unit'))[
-        'unit'
-      ]
-    : null;
-  return {name, value, unit};
+exports.extractParamaterFilter = (where) => {
+  if (where && where.and) {
+    const name = where.and.find((condition) =>
+      Object.keys(condition).includes('name'),
+    )
+      ? where.and.find((condition) => Object.keys(condition).includes('name'))[
+          'name'
+        ]
+      : null;
+    const value = where.and.find((condition) =>
+      Object.keys(condition).includes('value'),
+    )
+      ? where.and.find((condition) => Object.keys(condition).includes('value'))[
+          'value'
+        ]
+      : null;
+    const unit = where.and.find((condition) =>
+      Object.keys(condition).includes('unit'),
+    )
+      ? where.and.find((condition) => Object.keys(condition).includes('unit'))[
+          'unit'
+        ]
+      : null;
+    return {name, value, unit};
+  } else {
+    return {name: null, value: null, unit: null};
+  }
 };

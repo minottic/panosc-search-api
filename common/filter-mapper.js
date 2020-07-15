@@ -198,7 +198,7 @@ const mapWhereFilter = (where, model) => {
         break;
       }
       case 'parameters': {
-        const {name, value, unit} = utils.extractParamater(where);
+        const {name, value, unit} = utils.extractParamaterFilter(where);
         if (name) {
           console.log('>>> parameter name', name);
           scicatWhere.and = [];
