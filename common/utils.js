@@ -4,7 +4,7 @@ const math = require('mathjs');
 
 /**
  * Get inclusions from filter
- * @param {object} filter Loopback filter object
+ * @param {object} filter PaNOSC loopback filter object
  * @returns {object} Object with primary relation as key and loopback filter object as value
  */
 
@@ -21,7 +21,7 @@ exports.getInclusions = (filter) =>
 
 /**
  * Get names of inclusions from filter
- * @param {object} filter LoopBack filter object
+ * @param {object} filter PaNOSC loopBack filter object
  * @returns {object} Object with primary relation as key and and an array of secondary relations as value
  */
 
@@ -125,7 +125,7 @@ exports.convertToUnit = (value, unit, toUnit) => {
 
 /**
  * Extracts the name, value and unit from parameter where filter
- * @param {object} where Parameter where filter object
+ * @param {object} where PaNOSC parameter where filter object
  * @returns {object} Object with the extracted name, value and unit
  */
 

@@ -165,8 +165,8 @@ exports.document = async (scicatPublishedData, filter) => {
 
 /**
  * Map an array of SciCat origDatablocks to an array of PaNOSC files
- * @param {array} scicatOrigDatablocks Array of SciCat origDatablock objects
- * @returns {array} Array of PaNOSC file objects
+ * @param {object[]} scicatOrigDatablocks Array of SciCat origDatablock objects
+ * @returns {object[]} Array of PaNOSC file objects
  */
 
 exports.files = (scicatOrigDatablocks) => {
@@ -208,7 +208,7 @@ exports.instrument = (scicatInstrument) => {
  * Map SciCat publication members to PaNOSC members
  * @param {object} scicatPublishedData SciCat publishedData object
  * @param {object} filter PaNOSC loopback filter object
- * @returns {array} Array of PaNOSC members
+ * @returns {object[]} Array of PaNOSC members
  */
 
 exports.members = (scicatPublishedData, filter) => {
@@ -240,7 +240,7 @@ exports.members = (scicatPublishedData, filter) => {
  * Map SciCat scientificMetadata to PaNOSC parameters
  * @param {object} scientificMetadata SciCat scientificMetadata object
  * @param {object} filter PaNOSC loopback filter object
- * @returns {array} Array of PaNOSC parameter objects
+ * @returns {object[]} Array of PaNOSC parameter objects
  */
 
 exports.parameters = (scientificMetadata, filter) => {
