@@ -434,15 +434,6 @@ const mapIncludeFilter = (include) =>
         }
         break;
       }
-      case 'samples': {
-        break;
-      }
-      case 'techniques': {
-        break;
-      }
-      default: {
-        break;
-      }
     }
     return inclusion;
   });

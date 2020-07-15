@@ -96,6 +96,17 @@ exports.filterOnSecondary = (result, primary, secondary) =>
         ).length > 0,
   );
 
+exports.getInclusions = (filter) =>
+  filter && filter.include
+    ? Object.assign(
+        ...filter.include.map((inclusion) =>
+          inclusion.scope
+            ? {[inclusion.relation]: inclusion.scope}
+            : {[inclusion.relation]: {}},
+        ),
+      )
+    : {};
+
 exports.convertToSI = (value, unit) => {
   const quantity = math.unit(value, unit).toSI().toString();
   const convertedValue = quantity.substring(0, quantity.indexOf(' '));

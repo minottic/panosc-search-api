@@ -16,7 +16,7 @@ exports.dataset = async (scicatDataset, filter) => {
     creationDate: scicatDataset.creationTime,
   };
 
-  const inclusions = getInclusions(filter);
+  const inclusions = utils.getInclusions(filter);
 
   try {
     if (Object.keys(inclusions).includes('document')) {
@@ -26,7 +26,10 @@ exports.dataset = async (scicatDataset, filter) => {
       );
       dataset.document =
         scicatPublishedData.length > 0
-          ? this.document(scicatPublishedData[0], inclusions.document)
+          ? await this.publishedData(
+              scicatPublishedData[0],
+              inclusions.document,
+            )
           : {};
     }
     if (Object.keys(inclusions).includes('files')) {
@@ -122,7 +125,7 @@ exports.publishedData = async (scicatPublishedData, filter) => {
     doi: scicatPublishedData.doi,
   };
 
-  const inclusions = getInclusions(filter);
+  const inclusions = utils.getInclusions(filter);
 
   try {
     if (Object.keys(inclusions).includes('datasets')) {
@@ -232,14 +235,3 @@ exports.sample = (scicatSample) => {
     name: scicatSample.description,
   };
 };
-
-const getInclusions = (filter) =>
-  filter && filter.include
-    ? Object.assign(
-        ...filter.include.map((inclusion) =>
-          inclusion.scope
-            ? {[inclusion.relation]: inclusion.scope}
-            : {[inclusion.relation]: {}},
-        ),
-      )
-    : {};
