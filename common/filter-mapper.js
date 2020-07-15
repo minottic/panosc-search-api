@@ -3,6 +3,12 @@
 const mappings = require('./mappings');
 const utils = require('./utils');
 
+/**
+ * Map PaNOSC dataset filter to SciCat dataset filter
+ * @param {object} filter PaNOSC loopback filter object
+ * @returns {object} SciCat loopback filter object
+ */
+
 exports.dataset = (filter) => {
   if (!filter) {
     return null;
@@ -41,6 +47,12 @@ exports.dataset = (filter) => {
     return scicatFilter;
   }
 };
+
+/**
+ * Map PaNOSC document filter to SciCat publishedData filter
+ * @param {object} filter PaNOSC loopback filter object
+ * @returns {object} SciCat loopback filter object
+ */
 
 exports.document = (filter) => {
   if (!filter) {
@@ -96,6 +108,12 @@ exports.document = (filter) => {
   }
 };
 
+/**
+ * Map PaNOSC files filter to SciCat origDatablocks filter
+ * @param {object} filter PaNOSC loopback filter object
+ * @returns {object} SciCat loopback filter object
+ */
+
 exports.files = (filter) => {
   let scicatFilter = {};
   if (!filter) {
@@ -111,6 +129,12 @@ exports.files = (filter) => {
   }
   return scicatFilter;
 };
+
+/**
+ * Map PaNOSC instrument filter to SciCat instrument filter
+ * @param {object} filter PaNOSC loopback filter object
+ * @returns {object} SciCat loopback filter object
+ */
 
 exports.instrument = (filter) => {
   if (!filter) {
@@ -148,6 +172,12 @@ exports.instrument = (filter) => {
   }
 };
 
+/**
+ * Map PaNOSC sample filter to SciCat sample filter
+ * @param {object} filter PaNOSC loopback filter object
+ * @returns {object} SciCat loopback filter object
+ */
+
 exports.sample = (filter) => {
   if (!filter) {
     return null;
@@ -159,6 +189,13 @@ exports.sample = (filter) => {
     return scicatFilter;
   }
 };
+
+/**
+ * Map PaNOSC where filter to SciCat where filter
+ * @param {object} where PaNOSC loopback where filter object
+ * @param {string} model PaNOSC model name
+ * @returns {object} SciCat loopback where filter object
+ */
 
 const mapWhereFilter = (where, model) => {
   let scicatWhere = {};
@@ -407,6 +444,12 @@ const mapWhereFilter = (where, model) => {
   return scicatWhere;
 };
 
+/**
+ * Map PaNOSC include filter to SciCat include filter
+ * @param {object} include PaNOSC loopback include filter object
+ * @returns {object} SciCat loopback include filter object
+ */
+
 const mapIncludeFilter = (include) =>
   include.map((item) => {
     let inclusion = {};
@@ -438,7 +481,14 @@ const mapIncludeFilter = (include) =>
     return inclusion;
   });
 
-function mapMembers(members, filter) {
+/**
+ * Map PaNOSC member filter to SciCat member filter
+ * @param {object} members PaNOSC loopback member filter object
+ * @param {object} filter SciCat loopback filter object
+ * @returns {object} SciCat loopback filter object
+ */
+
+const mapMembers = (members, filter) => {
   const person = members.scope.include.find(
     (inclusion) => inclusion.relation === 'person',
   );
@@ -463,7 +513,14 @@ function mapMembers(members, filter) {
     }
   }
   return filter;
-}
+};
+
+/**
+ * Map PaNOSC paramter filter to SciCat scientificMetadata filter
+ * @param {object} parameters PaNOSC loopback parameter filter object
+ * @param {object} filter SciCat loopback filter object
+ * @returns {object} SciCat loopback filter object
+ */
 
 const mapParameters = (parameters, filter) => {
   if (filter.where) {
@@ -488,6 +545,13 @@ const mapParameters = (parameters, filter) => {
   }
   return filter;
 };
+
+/**
+ * Map PaNOSC technique filter to SciCat technique filter
+ * @param {object} techniques PaNOSC loopback technique filter object
+ * @param {object} filter SciCat loopback filter object
+ * @returns {object} SciCat loopback filter object
+ */
 
 const mapTechniques = (techniques, filter) => {
   if (filter.where) {
