@@ -74,7 +74,6 @@ exports.document = (filter) => {
       const members = filter.include.find(
         (inclusion) => inclusion.relation === 'members',
       );
-      console.log('>>> document filter.include members', members);
 
       if (members && members.scope) {
         scicatFilter = mapMembers(members, scicatFilter);
@@ -98,7 +97,6 @@ exports.document = (filter) => {
 };
 
 exports.files = (filter) => {
-  console.log('>>> FilterMapper.files filter', filter);
   let scicatFilter = {};
   if (!filter) {
     scicatFilter.include = [{relation: 'origdatablocks'}];
@@ -163,8 +161,6 @@ exports.sample = (filter) => {
 };
 
 const mapWhereFilter = (where, model) => {
-  console.log('>>> mapWhereFilter where', where);
-  console.log('>>> mapWhereFilter model', model);
   let scicatWhere = {};
   if (where.and) {
     switch (model) {
@@ -205,12 +201,9 @@ const mapWhereFilter = (where, model) => {
       case 'parameters': {
         const {name, value, unit} = utils.extractParamaterFilter(where);
         if (name) {
-          console.log('>>> parameter name', name);
           scicatWhere.and = [];
           if (value) {
-            console.log('>>> parameter value', value);
             if (unit) {
-              console.log('>>> parameter unit', unit);
               if (isNaN(value)) {
                 const extractedValue = Object.values(value).pop();
                 if (Array.isArray(extractedValue)) {
@@ -411,7 +404,6 @@ const mapWhereFilter = (where, model) => {
       }
     }
   }
-  console.log('>>>> scicatWhere', scicatWhere);
   return scicatWhere;
 };
 
@@ -452,8 +444,6 @@ const mapIncludeFilter = (include) =>
         break;
       }
     }
-
-    console.log('>>> inclusion', JSON.stringify(inclusion));
     return inclusion;
   });
 

@@ -16,10 +16,7 @@ exports.dataset = async (scicatDataset, filter) => {
     creationDate: scicatDataset.creationTime,
   };
 
-  console.log('>>> ResponseMapper.dataset default dataset', dataset);
-
   const inclusions = getInclusions(filter);
-  console.log('>>> ResponseMapper.dataset inclusions', inclusions);
 
   try {
     if (Object.keys(inclusions).includes('document')) {
@@ -53,12 +50,7 @@ exports.dataset = async (scicatDataset, filter) => {
     if (Object.keys(inclusions).includes('samples')) {
       const sampleId = scicatDataset.sampleId;
       if (sampleId) {
-        console.log('>>> ResponseMapper.dataset sampleId', sampleId);
         const scicatFilter = filterMapper.sample(inclusions.samples);
-        console.log(
-          '>>> ResponseMapper.dataset sample filter',
-          JSON.stringify(scicatFilter),
-        );
         let filter = {};
         if (scicatFilter.where) {
           filter = {where: {}};
@@ -93,8 +85,6 @@ exports.dataset = async (scicatDataset, filter) => {
   } catch (err) {
     throw err;
   }
-
-  console.log('>>> dataset', dataset);
   return dataset;
 };
 
@@ -134,15 +124,9 @@ exports.publishedData = async (scicatPublishedData, filter) => {
 
   const inclusions = getInclusions(filter);
 
-  console.log('>>> pubData inclusions', inclusions);
-
   try {
     if (Object.keys(inclusions).includes('datasets')) {
       const scicatFilter = filterMapper.dataset(inclusions.datasets);
-      console.log(
-        '>>> ResponseMapper dataset scicatFilter',
-        JSON.stringify(scicatFilter),
-      );
       const datasets = await Promise.all(
         scicatPublishedData.pidArray
           .map((pid) =>
@@ -171,7 +155,6 @@ exports.publishedData = async (scicatPublishedData, filter) => {
               : {};
           }),
       );
-      console.log('>>> ResponseMapper.document datasets', datasets);
       document.datasets = await Promise.all(
         datasets.map(
           async (dataset) => await this.dataset(dataset, inclusions.datasets),
@@ -187,7 +170,6 @@ exports.publishedData = async (scicatPublishedData, filter) => {
   } catch (err) {
     throw err;
   }
-  console.log('>>> document', document);
   return document;
 };
 
