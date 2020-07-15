@@ -1,6 +1,7 @@
 'use strict';
 
 const mappings = require('./mappings');
+const utils = require('./utils');
 
 exports.dataset = (filter) => {
   if (!filter) {
@@ -197,34 +198,67 @@ const mapWhereFilter = (where, model) => {
         break;
       }
       case 'parameters': {
-        const name = where.and.find((condition) =>
-          Object.keys(condition).includes('name'),
-        )
-          ? where.and.find((condition) =>
-              Object.keys(condition).includes('name'),
-            )['name']
-          : null;
-        const value = where.and.find((condition) =>
-          Object.keys(condition).includes('value'),
-        )
-          ? where.and.find((condition) =>
-              Object.keys(condition).includes('value'),
-            )['value']
-          : null;
-        const unit = where.and.find((condition) =>
-          Object.keys(condition).includes('unit'),
-        )
-          ? where.and.find((condition) =>
-              Object.keys(condition).includes('unit'),
-            )['unit']
-          : null;
+        const {name, value, unit} = utils.extractParamater(where);
         if (name) {
+          console.log('>>> parameter name', name);
           scicatWhere.and = [];
           if (value) {
-            scicatWhere.and.push({[`scientificMetadata.${name}.value`]: value});
-          }
-          if (unit) {
-            scicatWhere.and.push({[`scientificMetadata.${name}.unit`]: unit});
+            console.log('>>> parameter value', value);
+            if (unit) {
+              console.log('>>> parameter unit', unit);
+              if (isNaN(value)) {
+                const extractedValue = Object.values(value).pop();
+                if (Array.isArray(extractedValue)) {
+                  const arrayValues = extractedValue.map((value) =>
+                    utils.convertToSI(value, unit),
+                  );
+                  const formattedValueSI = Object.assign(
+                    ...Object.keys(value).map((key) => ({
+                      [key]: arrayValues.map((item) => item.valueSI),
+                    })),
+                  );
+                  const unitSI = arrayValues.pop().unitSI;
+                  scicatWhere.and.push({
+                    [`scientificMetadata.${name}.valueSI`]: formattedValueSI,
+                  });
+                  scicatWhere.and.push({
+                    [`scientificMetadata.${name}.unitSI`]: unitSI,
+                  });
+                } else {
+                  const {valueSI, unitSI} = utils.convertToSI(
+                    extractedValue,
+                    unit,
+                  );
+                  const formattedValueSI = Object.assign(
+                    ...Object.keys(value).map((key) => ({[key]: valueSI})),
+                  );
+                  scicatWhere.and.push({
+                    [`scientificMetadata.${name}.valueSI`]: formattedValueSI,
+                  });
+                  scicatWhere.and.push({
+                    [`scientificMetadata.${name}.unitSI`]: unitSI,
+                  });
+                }
+              } else {
+                const {valueSI, unitSI} = utils.convertToSI(value, unit);
+                scicatWhere.and.push({
+                  [`scientificMetadata.${name}.valueSI`]: valueSI,
+                });
+                scicatWhere.and.push({
+                  [`scientificMetadata.${name}.unitSI`]: unitSI,
+                });
+              }
+            } else {
+              scicatWhere.and.push({
+                [`scientificMetadata.${name}.value`]: value,
+              });
+            }
+          } else {
+            const err = new Error();
+            err.name = 'FilterError';
+            err.message = 'Parameter value was not provided';
+            err.statusCode = 400;
+            throw err;
           }
         } else {
           const err = new Error();

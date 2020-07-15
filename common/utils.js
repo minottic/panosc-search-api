@@ -1,5 +1,7 @@
 'use strict';
 
+const math = require('mathjs');
+
 /**
  * Get primary relations from filter
  * @param {string} filter LoopBack filter object
@@ -93,3 +95,35 @@ exports.filterOnSecondary = (result, primary, secondary) =>
             : Object.keys(child[secondary]).length > 0,
         ).length > 0,
   );
+
+exports.convertToSI = (value, unit) => {
+  const quantity = math.unit(value, unit).toSI().toString();
+  const convertedValue = quantity.substring(0, quantity.indexOf(' '));
+  const convertedUnit = quantity.substring(quantity.indexOf(' ') + 1);
+  return {valueSI: Number(convertedValue), unitSI: convertedUnit};
+};
+
+exports.extractParamater = (where) => {
+  const name = where.and.find((condition) =>
+    Object.keys(condition).includes('name'),
+  )
+    ? where.and.find((condition) => Object.keys(condition).includes('name'))[
+        'name'
+      ]
+    : null;
+  const value = where.and.find((condition) =>
+    Object.keys(condition).includes('value'),
+  )
+    ? where.and.find((condition) => Object.keys(condition).includes('value'))[
+        'value'
+      ]
+    : null;
+  const unit = where.and.find((condition) =>
+    Object.keys(condition).includes('unit'),
+  )
+    ? where.and.find((condition) => Object.keys(condition).includes('unit'))[
+        'unit'
+      ]
+    : null;
+  return {name, value, unit};
+};

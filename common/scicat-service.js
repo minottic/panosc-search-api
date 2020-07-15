@@ -1,7 +1,7 @@
 'use strict';
 
 const superagent = require('superagent');
-const baseUrl = 'http://localhost:3030/api/v3';
+const baseUrl = process.env.BASE_URL || 'http://localhost:3030/api/v3';
 
 exports.Dataset = class {
   async find(filter) {
