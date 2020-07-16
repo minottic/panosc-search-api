@@ -22,13 +22,13 @@ exports.dataset = (filter) => {
         (inclusion) => inclusion.relation === 'parameters',
       );
       if (parameters && parameters.scope && parameters.scope.where) {
-        scicatFilter = mapParameters(parameters, scicatFilter);
+        scicatFilter = mapField(parameters, scicatFilter);
       }
       const techniques = filter.include.find(
         (inclusion) => inclusion.relation === 'techniques',
       );
       if (techniques && techniques.scope && techniques.scope.where) {
-        scicatFilter = mapTechniques(techniques, scicatFilter);
+        scicatFilter = mapField(techniques, scicatFilter);
       }
       const include = filter.include
         .filter((inclusion) => inclusion.relation !== 'parameters')
@@ -361,6 +361,91 @@ const mapWhereFilter = (where, model) => {
         );
         break;
       }
+      case 'parameters': {
+        const parameters = where.or.map((condition) =>
+          utils.extractParamaterFilter(condition),
+        );
+        const scientificMetadata = parameters.map(({name, value, unit}) => {
+          if (name) {
+            const filter = {and: []};
+            if (value) {
+              if (unit) {
+                if (isNaN(value)) {
+                  const extractedValue = Object.values(value).pop();
+                  if (Array.isArray(extractedValue)) {
+                    const arrayValues = extractedValue.map((value) =>
+                      utils.convertToSI(value, unit),
+                    );
+                    const formattedValueSI = Object.assign(
+                      ...Object.keys(value).map((key) => ({
+                        [key]: arrayValues.map((item) => item.valueSI),
+                      })),
+                    );
+                    const unitSI = arrayValues.pop().unitSI;
+                    filter.and.push({
+                      [`scientificMetadata.${name}.valueSI`]: formattedValueSI,
+                    });
+                    filter.and.push({
+                      [`scientificMetadata.${name}.unitSI`]: unitSI,
+                    });
+                  } else {
+                    const {valueSI, unitSI} = utils.convertToSI(
+                      extractedValue,
+                      unit,
+                    );
+                    const formattedValueSI = Object.assign(
+                      ...Object.keys(value).map((key) => ({[key]: valueSI})),
+                    );
+                    filter.and.push({
+                      [`scientificMetadata.${name}.valueSI`]: formattedValueSI,
+                    });
+                    filter.and.push({
+                      [`scientificMetadata.${name}.unitSI`]: unitSI,
+                    });
+                  }
+                } else {
+                  const {valueSI, unitSI} = utils.convertToSI(value, unit);
+                  filter.and.push({
+                    [`scientificMetadata.${name}.valueSI`]: valueSI,
+                  });
+                  filter.and.push({
+                    [`scientificMetadata.${name}.unitSI`]: unitSI,
+                  });
+                }
+              } else {
+                return {[`scientificMetadata.${name}.value`]: value};
+              }
+              return filter;
+            } else {
+              const err = new Error();
+              err.name = 'FilterError';
+              err.message = 'Parameter value vas not provided';
+              err.statusCode = 400;
+              throw err;
+            }
+          } else {
+            const err = new Error();
+            err.name = 'FilterError';
+            err.message = 'Parameter name was not provided';
+            err.statusCode = 400;
+            throw err;
+          }
+        });
+        if (
+          scientificMetadata.some((condition) =>
+            Object.keys(condition).includes('and'),
+          )
+        ) {
+          scicatWhere.or = scientificMetadata;
+        } else {
+          if (scicatWhere.and) {
+            scicatWhere.and.push(scientificMetadata);
+          } else {
+            scicatWhere.and = scientificMetadata;
+          }
+        }
+        break;
+      }
       case 'samples': {
         scicatWhere.or = where.or.map((item) =>
           Object.assign(
@@ -423,6 +508,13 @@ const mapWhereFilter = (where, model) => {
         ];
         break;
       }
+      case 'parameters': {
+        const err = new Error();
+        err.name = 'FilterError';
+        err.message = 'Parameter filter requires at least a name and a value';
+        err.statusCode = 400;
+        throw err;
+      }
       case 'samples': {
         scicatWhere = Object.assign(
           ...Object.keys(where).map((key) => ({
@@ -482,6 +574,33 @@ const mapIncludeFilter = (include) =>
   });
 
 /**
+ * Map PaNOSC field to SciCat field
+ * @param {object} field PaNOSC loopback field filter object
+ * @param {object} filter SciCat loopback filter object
+ * @returns {object} SciCat loopback filter object
+ */
+
+const mapField = (field, filter) => {
+  if (filter.where) {
+    const scicatField =
+      field.relation === 'parameters'
+        ? mapWhereFilter(field.scope.where, field.relation)['and']
+        : mapWhereFilter(field.scope.where, field.relation);
+    if (filter.where.and) {
+      filter.where.and = filter.where.and.concat(scicatField);
+    } else if (filter.where.or) {
+      filter.where.and = scicatField.concat({or: filter.where.or});
+      delete filter.where.or;
+    } else {
+      filter.where = {and: scicatField.concat(filter.where)};
+    }
+  } else {
+    filter.where = mapWhereFilter(field.scope.where, field.relation);
+  }
+  return filter;
+};
+
+/**
  * Map PaNOSC member filter to SciCat member filter
  * @param {object} members PaNOSC loopback member filter object
  * @param {object} filter SciCat loopback filter object
@@ -511,64 +630,6 @@ const mapMembers = (members, filter) => {
     } else {
       filter.where = mapWhereFilter(person.scope.where, members.relation);
     }
-  }
-  return filter;
-};
-
-/**
- * Map PaNOSC paramter filter to SciCat scientificMetadata filter
- * @param {object} parameters PaNOSC loopback parameter filter object
- * @param {object} filter SciCat loopback filter object
- * @returns {object} SciCat loopback filter object
- */
-
-const mapParameters = (parameters, filter) => {
-  if (filter.where) {
-    const scicatParameters = mapWhereFilter(
-      parameters.scope.where,
-      parameters.relation,
-    )['and'];
-    if (filter.where.and) {
-      filter.where.and = filter.where.and.concat(scicatParameters);
-    } else if (filter.where.or) {
-      filter.where.and = scicatParameters.concat({
-        or: filter.where.or,
-      });
-      delete filter.where.or;
-    } else {
-      filter.where = {
-        and: scicatParameters.concat(filter.where),
-      };
-    }
-  } else {
-    filter.where = mapWhereFilter(parameters.scope.where, parameters.relation);
-  }
-  return filter;
-};
-
-/**
- * Map PaNOSC technique filter to SciCat technique filter
- * @param {object} techniques PaNOSC loopback technique filter object
- * @param {object} filter SciCat loopback filter object
- * @returns {object} SciCat loopback filter object
- */
-
-const mapTechniques = (techniques, filter) => {
-  if (filter.where) {
-    const scicatTechniques = mapWhereFilter(
-      techniques.scope.where,
-      techniques.relation,
-    );
-    if (filter.where.and) {
-      filter.where.and = filter.where.and.concat(scicatTechniques);
-    } else if (filter.where.or) {
-      filter.where.and = scicatTechniques.concat({or: filter.where.or});
-      delete filter.where.or;
-    } else {
-      filter.where = {and: scicatTechniques.concat(filter.where)};
-    }
-  } else {
-    filter.where = mapWhereFilter(techniques.scope.where, techniques.relation);
   }
   return filter;
 };

@@ -59,7 +59,6 @@ describe('Dataset', () => {
             if (err) throw err;
 
             expect(res.body).to.be.an('array');
-            expect(res.body.length).to.equal(2);
             res.body.forEach((dataset) => {
               expect(dataset).to.have.property('pid');
               expect(dataset).to.have.property('title');
@@ -114,7 +113,6 @@ describe('Dataset', () => {
               if (err) throw err;
 
               expect(res.body).to.be.an('array');
-              expect(res.body.length).to.equal(1);
               res.body.forEach((dataset) => {
                 expect(dataset).to.have.property('pid');
                 expect(dataset).to.have.property('title');
@@ -181,7 +179,6 @@ describe('Dataset', () => {
               if (err) throw err;
 
               expect(res.body).to.be.an('array');
-              expect(res.body.length).to.equal(1);
               res.body.forEach((dataset) => {
                 expect(dataset).to.have.property('pid');
                 expect(dataset).to.have.property('title');
@@ -236,7 +233,6 @@ describe('Dataset', () => {
             if (err) throw err;
 
             expect(res.body).to.be.an('array');
-            expect(res.body.length).to.equal(1);
             res.body.forEach((dataset) => {
               expect(dataset).to.have.property('pid');
               expect(dataset).to.have.property('title');
@@ -279,7 +275,6 @@ describe('Dataset', () => {
             if (err) throw err;
 
             expect(res.body).to.be.an('array');
-            expect(res.body.length).to.equal(1);
             res.body.forEach((dataset) => {
               expect(dataset).to.have.property('pid');
               expect(dataset).to.have.property('title');
