@@ -5,6 +5,8 @@ const request = require('supertest');
 
 let app;
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 before((done) => {
   app = require('../server/server');
   done();

@@ -5,6 +5,8 @@ const request = require('supertest');
 
 let app;
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 before((done) => {
   app = require('../server/server');
   done();
@@ -335,7 +337,7 @@ describe('Document', () => {
 
   describe('GET /documents/{id}', () => {
     it('should return the document with the requested pid', (done) => {
-      const pid = '10.5072/c0186551-518e-4d17-99fc-16140ed06f8f';
+      const pid = '10.17199/BRIGHTNESS/MB0001';
       request(app)
         .get(requestUrl + '/' + encodeURIComponent(pid))
         .set('Accept', 'application/json')

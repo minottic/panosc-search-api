@@ -5,6 +5,8 @@ const request = require('supertest');
 
 let app;
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 before((done) => {
   app = require('../server/server');
   done();
@@ -295,7 +297,7 @@ describe('Dataset', () => {
 
   describe('GET /datasets/{id}', () => {
     it('should return the dataset with the requested id', (done) => {
-      const pid = '20.500.12269/cbe31b45-d7b6-4446-a516-6aae99950517';
+      const pid = '20.500.12269/BRIGHTNESS/MB0001';
       request(app)
         .get(requestUrl + '/' + encodeURIComponent(pid))
         .set('Accept', 'application/json')
