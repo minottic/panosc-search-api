@@ -11,7 +11,7 @@ before((done) => {
 });
 
 describe('Dataset', () => {
-  const requestUrl = '/api/Datasets';
+  const requestUrl = '/panosc-api/Datasets';
   describe('GET /datasets', () => {
     context('without filter', () => {
       it('should return en array of datasets', (done) => {

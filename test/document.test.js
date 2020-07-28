@@ -11,7 +11,7 @@ before((done) => {
 });
 
 describe('Document', () => {
-  const requestUrl = '/api/Documents';
+  const requestUrl = '/panosc-api/Documents';
   describe('GET /documents', () => {
     context('without filter', () => {
       it('should return an array of documents', (done) => {

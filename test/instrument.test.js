@@ -11,7 +11,7 @@ before((done) => {
 });
 
 describe('Instrument', () => {
-  const requestUrl = '/api/Instruments';
+  const requestUrl = '/panosc-api/Instruments';
   describe('GET /instruments', () => {
     context('without filter', () => {
       it('should return an array of instruments', (done) => {
