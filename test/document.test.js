@@ -56,6 +56,9 @@ describe('Document', () => {
         sandbox
           .stub(ScicatPubDataService.prototype, 'find')
           .resolves(mockStubs.publishedData.find.personFilter);
+        const callback = sandbox.stub(ScicatDatasetService.prototype, 'find');
+        callback.onCall(0).resolves(mockStubs.dataset.find.personFilter[0]);
+        callback.onCall(1).resolves(mockStubs.dataset.find.personFilter[1]);
 
         const filter = JSON.stringify({
           where: {

@@ -271,6 +271,7 @@ module.exports = {
   dataset: {
     find: {
       noFilter: [dataset1, dataset2, dataset3, dataset4],
+      personFilter: [[dataset3], [dataset4]],
       photonEnergyFilter: [dataset2],
       solidCopperFilter: [dataset1],
       techniquesFilter: [dataset3, dataset4],
