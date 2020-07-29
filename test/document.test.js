@@ -2,13 +2,22 @@
 
 const expect = require('chai').expect;
 const request = require('supertest');
+const sandbox = require('sinon').createSandbox();
+
+const mockStubs = require('./MockStubs');
+const ScicatService = require('../common/scicat-service');
+const ScicatPubDataService = ScicatService.PublishedData;
+const ScicatDatasetService = ScicatService.Dataset;
+const ScicatSampleService = ScicatService.Sample;
 
 let app;
-
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 before((done) => {
   app = require('../server/server');
+  done();
+});
+
+afterEach((done) => {
+  sandbox.restore();
   done();
 });
 
@@ -17,6 +26,10 @@ describe('Document', () => {
   describe('GET /documents', () => {
     context('without filter', () => {
       it('should return an array of documents', (done) => {
+        sandbox
+          .stub(ScicatPubDataService.prototype, 'find')
+          .resolves(mockStubs.publishedData.find.noFilter);
+
         request(app)
           .get(requestUrl)
           .set('Accept', 'application/json')
@@ -38,72 +51,71 @@ describe('Document', () => {
       });
     });
 
-    context(
-      'where type is proposal and the principal investigator is a specific person',
-      () => {
-        it('should return an array of documents matching the type and the person', (done) => {
-          const filter = JSON.stringify({
-            where: {
-              type: 'proposal',
+    context('where type is publication and person is James Chadwick', () => {
+      it('should return an array of documents matching the type and the person', (done) => {
+        sandbox
+          .stub(ScicatPubDataService.prototype, 'find')
+          .resolves(mockStubs.publishedData.find.personFilter);
+
+        const filter = JSON.stringify({
+          where: {
+            type: 'publication',
+          },
+          include: [
+            {
+              relation: 'datasets',
             },
-            include: [
-              {
-                relation: 'datasets',
-              },
-              {
-                relation: 'members',
-                scope: {
-                  where: {
-                    role: 'principal investigator',
-                  },
-                  include: [
-                    {
-                      relation: 'person',
-                      scope: {
-                        where: {
-                          fullName: 'James Chadwick',
-                        },
+            {
+              relation: 'members',
+              scope: {
+                include: [
+                  {
+                    relation: 'person',
+                    scope: {
+                      where: {
+                        fullName: 'James Chadwick',
                       },
                     },
-                  ],
-                },
+                  },
+                ],
               },
-            ],
-          });
-          request(app)
-            .get(requestUrl + '?filter=' + filter)
-            .set('Accept', 'application/json')
-            .expect(200)
-            .expect('Content-Type', /json/)
-            .end((err, res) => {
-              if (err) throw err;
-
-              expect(res.body).to.be.an('array');
-              res.body.forEach((document) => {
-                expect(document).to.have.property('pid');
-                expect(document).to.have.property('isPublic');
-                expect(document).to.have.property('type');
-                expect(document).to.have.property('title');
-                expect(document).to.have.property('score');
-                expect(document).to.have.property('datasets');
-                expect(document.datasets).to.be.an('array').and.not.empty;
-                expect(document).to.have.property('members');
-                expect(document.members).to.be.an('array').and.not.empty;
-                document.members.forEach((member) => {
-                  expect(member.role).to.equal('principal investigator');
-                  expect(member.person.fullName).to.equal('James Chadwick');
-                });
-              });
-              done();
-            });
+            },
+          ],
         });
-      },
-    );
+        request(app)
+          .get(requestUrl + '?filter=' + filter)
+          .set('Accept', 'application/json')
+          .expect(200)
+          .expect('Content-Type', /json/)
+          .end((err, res) => {
+            if (err) throw err;
+
+            expect(res.body).to.be.an('array');
+            res.body.forEach((document) => {
+              expect(document).to.have.property('pid');
+              expect(document).to.have.property('isPublic');
+              expect(document).to.have.property('type');
+              expect(document).to.have.property('title');
+              expect(document).to.have.property('score');
+              expect(document).to.have.property('datasets');
+              expect(document.datasets).to.be.an('array').and.not.empty;
+              expect(document).to.have.property('members');
+              expect(document.members).to.be.an('array').and.not.empty;
+              document.members.forEach((member) => {
+                expect(member.person.fullName).to.equal('James Chadwick');
+              });
+            });
+            done();
+          });
+      });
+    });
 
     context(
       'where parameters has a wavelength in the range 1000-1100 nm',
       () => {
         it('should return an array of documents matching the parameter', (done) => {
+          sandbox.stub(ScicatPubDataService.prototype, 'find').resolves([]);
+
           const filter = JSON.stringify({
             include: [
               {
@@ -161,6 +173,23 @@ describe('Document', () => {
       'where dataset parameters has a wavelength in the range 1000-1100 nm',
       () => {
         it('should return an array of documents with datasets matching the parameter', (done) => {
+          sandbox
+            .stub(ScicatPubDataService.prototype, 'find')
+            .resolves(mockStubs.publishedData.find.noFilter);
+          const callback = sandbox.stub(ScicatDatasetService.prototype, 'find');
+          callback
+            .onCall(0)
+            .resolves(mockStubs.dataset.find.wavelengthFilter[0]);
+          callback
+            .onCall(1)
+            .resolves(mockStubs.dataset.find.wavelengthFilter[1]);
+          callback
+            .onCall(2)
+            .resolves(mockStubs.dataset.find.wavelengthFilter[2]);
+          callback
+            .onCall(3)
+            .resolves([mockStubs.dataset.find.wavelengthFilter[3]]);
+
           const filter = JSON.stringify({
             include: [
               {
@@ -229,6 +258,27 @@ describe('Document', () => {
       'where datasets are using technique x-ray absorption and sample is solid copper cylinder',
       () => {
         it('should return an array of documents with datasets using the technique and sample', (done) => {
+          sandbox
+            .stub(ScicatPubDataService.prototype, 'find')
+            .resolves(mockStubs.publishedData.find.noFilter);
+          const callback = sandbox.stub(ScicatDatasetService.prototype, 'find');
+          callback
+            .onCall(0)
+            .resolves(mockStubs.dataset.find.techniqueSampleFilter[0]);
+          callback
+            .onCall(1)
+            .resolves(mockStubs.dataset.find.techniqueSampleFilter[1]);
+          callback
+            .onCall(2)
+            .resolves(mockStubs.dataset.find.techniqueSampleFilter[2]);
+          callback
+            .onCall(3)
+            .resolves(mockStubs.dataset.find.techniqueSampleFilter[3]);
+
+          sandbox
+            .stub(ScicatSampleService.prototype, 'find')
+            .resolves(mockStubs.sample.find);
+
           const filter = JSON.stringify({
             include: [
               {
@@ -293,7 +343,7 @@ describe('Document', () => {
     );
 
     context('where datasets have a file matching text `file1`', () => {
-      it('should return an array of documents with datasets and files matching the query', (done) => {
+      xit('should return an array of documents with datasets and files matching the query', (done) => {
         const filter = JSON.stringify({
           include: [
             {
@@ -337,7 +387,11 @@ describe('Document', () => {
 
   describe('GET /documents/{id}', () => {
     it('should return the document with the requested pid', (done) => {
-      const pid = '10.17199/BRIGHTNESS/MB0001';
+      sandbox
+        .stub(ScicatPubDataService.prototype, 'findById')
+        .resolves(mockStubs.publishedData.findById);
+
+      const pid = '10.5072/panosc-test-publication1';
       request(app)
         .get(requestUrl + '/' + encodeURIComponent(pid))
         .set('Accept', 'application/json')

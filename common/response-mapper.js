@@ -60,7 +60,7 @@ exports.dataset = async (scicatDataset, filter) => {
         const scicatFilter = filterMapper.sample(inclusions.samples);
         let filter = {};
         if (scicatFilter.where) {
-          filter = {where: {}};
+          filter.where = {};
           if (scicatFilter.where.and) {
             filter.where.and = [];
             filter.where.and.push({sampleId});
@@ -114,51 +114,53 @@ exports.document = async (scicatPublishedData, filter) => {
 
   const inclusions = utils.getInclusions(filter);
 
-  try {
-    if (Object.keys(inclusions).includes('datasets')) {
+  if (Object.keys(inclusions).includes('datasets')) {
+    try {
       const scicatFilter = filterMapper.dataset(inclusions.datasets);
+      const pidArray = scicatPublishedData.pidArray.map((pid) =>
+        pid.split('/')[0] === pid.split('/')[1]
+          ? pid.split('/').slice(1).join('/')
+          : pid,
+      );
       const datasets = await Promise.all(
-        scicatPublishedData.pidArray
-          .map((pid) =>
-            pid.split('/')[0] === pid.split('/')[1]
-              ? pid.split('/').slice(1).join('/')
-              : pid,
-          )
-          .map(async (pid) => {
-            if (scicatFilter.where) {
-              if (scicatFilter.where.and) {
-                scicatFilter.where.and.push({pid});
-              } else if (scicatFilter.where.or) {
-                scicatFilter.where.and = [];
-                scicatFilter.where.and.push({pid});
-                scicatFilter.where.and.push({or: scicatFilter.where.or});
-                delete scicatFilter.where.or;
-              } else {
-                scicatFilter.where = {and: [{pid}].concat(scicatFilter.where)};
-              }
+        pidArray.map(async (pid) => {
+          let filter = {};
+          if (scicatFilter.where) {
+            filter.where = {};
+            if (scicatFilter.where.and) {
+              filter.where.and = [];
+              filter.where.and.push({pid});
+              filter.where.and = filter.where.and.concat(
+                scicatFilter.where.and,
+              );
+            } else if (scicatFilter.where.or) {
+              filter.where.and = [];
+              filter.where.and.push({pid});
+              filter.where.and.push({or: scicatFilter.where.or});
             } else {
-              scicatFilter.where = {pid};
+              filter.where = {and: [{pid}].concat(scicatFilter.where)};
             }
-            const datasets = await scicatDatasetService.find(scicatFilter);
-            return datasets.length > 0
-              ? datasets.find((dataset) => dataset.pid === pid)
-              : {};
-          }),
+          } else {
+            filter.where = {pid};
+          }
+          const datasets = await scicatDatasetService.find(filter);
+          return datasets.length > 0 ? datasets[0] : {};
+        }),
       );
       document.datasets = await Promise.all(
         datasets.map(
           async (dataset) => await this.dataset(dataset, inclusions.datasets),
         ),
       );
+    } catch (err) {
+      throw err;
     }
-    if (Object.keys(inclusions).includes('members')) {
-      document.members = this.members(scicatPublishedData, inclusions.members);
-    }
-    if (Object.keys(inclusions).includes('parameters')) {
-      document.parameters = [];
-    }
-  } catch (err) {
-    throw err;
+  }
+  if (Object.keys(inclusions).includes('members')) {
+    document.members = this.members(scicatPublishedData, inclusions.members);
+  }
+  if (Object.keys(inclusions).includes('parameters')) {
+    document.parameters = [];
   }
   return document;
 };

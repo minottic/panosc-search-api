@@ -2,13 +2,20 @@
 
 const expect = require('chai').expect;
 const request = require('supertest');
+const sandbox = require('sinon').createSandbox();
+
+const mockStubs = require('./MockStubs');
+const ScicatService = require('../common/scicat-service');
+const ScicatDatasetService = ScicatService.Dataset;
 
 let app;
-
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 before((done) => {
   app = require('../server/server');
+  done();
+});
+
+afterEach((done) => {
+  sandbox.restore();
   done();
 });
 
@@ -17,6 +24,10 @@ describe('Dataset', () => {
   describe('GET /datasets', () => {
     context('without filter', () => {
       it('should return en array of datasets', (done) => {
+        sandbox
+          .stub(ScicatDatasetService.prototype, 'find')
+          .resolves(mockStubs.dataset.find.noFilter);
+
         request(app)
           .get(requestUrl)
           .set('Accept', 'application/json')
@@ -40,6 +51,10 @@ describe('Dataset', () => {
 
     context('where technique is x-ray absorption', () => {
       it('should return en array of datasets matching the technique', (done) => {
+        sandbox
+          .stub(ScicatDatasetService.prototype, 'find')
+          .resolves(mockStubs.dataset.find.techniquesFilter);
+
         const filter = JSON.stringify({
           include: [
             {
@@ -82,6 +97,10 @@ describe('Dataset', () => {
       'where parameters has a photon energy in the range 880-990 eV',
       () => {
         it('should return en array of datasets matching the parameter', (done) => {
+          sandbox
+            .stub(ScicatDatasetService.prototype, 'find')
+            .resolves(mockStubs.dataset.find.photonEnergyFilter);
+
           const filter = JSON.stringify({
             include: [
               {
@@ -139,6 +158,10 @@ describe('Dataset', () => {
       'where parameters includes a solid sample containing copper',
       () => {
         it('should return en array of datasets matching the parameter', (done) => {
+          sandbox
+            .stub(ScicatDatasetService.prototype, 'find')
+            .resolves(mockStubs.dataset.find.solidCopperFilter);
+
           const filter = JSON.stringify({
             include: [
               {
@@ -202,6 +225,10 @@ describe('Dataset', () => {
 
     context('where parameters has a temperature below 80 °C', () => {
       it('should return en array of datasets matching the parameter', (done) => {
+        sandbox
+          .stub(ScicatDatasetService.prototype, 'find')
+          .resolves(mockStubs.dataset.find.temperatureFilter);
+
         const filter = JSON.stringify({
           include: [
             {
@@ -255,7 +282,7 @@ describe('Dataset', () => {
     });
 
     context('where file matches text `file1`', () => {
-      it('should return en array of datasets matching the query', (done) => {
+      xit('should return en array of datasets matching the query', (done) => {
         const filter = JSON.stringify({
           include: [
             {
@@ -297,7 +324,11 @@ describe('Dataset', () => {
 
   describe('GET /datasets/{id}', () => {
     it('should return the dataset with the requested id', (done) => {
-      const pid = '20.500.12269/BRIGHTNESS/MB0001';
+      sandbox
+        .stub(ScicatDatasetService.prototype, 'findById')
+        .resolves(mockStubs.dataset.findById);
+
+      const pid = '20.500.12269/panosc-dataset1';
       request(app)
         .get(requestUrl + '/' + encodeURIComponent(pid))
         .set('Accept', 'application/json')

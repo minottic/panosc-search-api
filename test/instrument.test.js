@@ -2,13 +2,19 @@
 
 const expect = require('chai').expect;
 const request = require('supertest');
+const sandbox = require('sinon').createSandbox();
+
+const mockStubs = require('./MockStubs');
+const ScicatInstrumentService = require('../common/scicat-service').Instrument;
 
 let app;
-
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 before((done) => {
   app = require('../server/server');
+  done();
+});
+
+afterEach((done) => {
+  sandbox.restore();
   done();
 });
 
@@ -17,6 +23,10 @@ describe('Instrument', () => {
   describe('GET /instruments', () => {
     context('without filter', () => {
       it('should return an array of instruments', (done) => {
+        sandbox
+          .stub(ScicatInstrumentService.prototype, 'find')
+          .resolves(mockStubs.instrument.find.noFilter);
+
         request(app)
           .get(requestUrl)
           .set('Accept', 'application/json')
@@ -39,6 +49,10 @@ describe('Instrument', () => {
 
     context('where name is equal to LoKI', () => {
       it('should return an array of instruments matching the query', (done) => {
+        sandbox
+          .stub(ScicatInstrumentService.prototype, 'find')
+          .resolves(mockStubs.instrument.find.nameFilter);
+
         const filter = JSON.stringify({
           where: {
             name: 'LoKI',
@@ -67,6 +81,10 @@ describe('Instrument', () => {
 
     context('where facility is equal to ESS, with pagination', () => {
       it('should return an array of instruments matching the query', (done) => {
+        sandbox
+          .stub(ScicatInstrumentService.prototype, 'find')
+          .resolves(mockStubs.instrument.find.facilityFilter);
+
         const filter = JSON.stringify({
           where: {
             facility: 'ESS',
@@ -99,7 +117,11 @@ describe('Instrument', () => {
 
   describe('GET /instruments/{id}', () => {
     it('should return the instrument with the requested pid', (done) => {
-      const pid = '125e8172-d0f4-4547-98be-a9db903a6269';
+      sandbox
+        .stub(ScicatInstrumentService.prototype, 'findById')
+        .resolves(mockStubs.instrument.findById);
+
+      const pid = '20.500.12269/27d2e842-a9d4-4897-aebb-30ba1743b956';
       request(app)
         .get(requestUrl + '/' + encodeURIComponent(pid))
         .set('Accept', 'application/json')
