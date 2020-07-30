@@ -25,28 +25,41 @@ exports.getInclusions = (filter) =>
  * @returns {object} Object with primary relation as key and and an array of secondary relations as value
  */
 
-exports.getInclusionNames = (filter) =>
-  filter && filter.include
+exports.getInclusionNames = (filter) => {
+  const primaryInclusions = filter.include
+    ? filter.include
+        .filter(
+          (primary) =>
+            (primary.scope && primary.scope.where) ||
+            (primary.scope && primary.scope.include),
+        )
+        .map(({relation}) => relation)
+    : [];
+
+  return primaryInclusions.length > 0 &&
+    filter.include.filter(
+      (inclusion) => inclusion.scope && inclusion.scope.include,
+    ).length > 0
     ? Object.assign(
-        ...filter.include
-          .filter(
-            (primary) =>
-              (primary.scope && primary.scope.where) ||
-              (primary.scope && primary.scope.include),
-          )
-          .map((inclusion) =>
-            inclusion.scope && inclusion.scope.include
-              ? {
-                  [inclusion.relation]: inclusion.scope.include
+        ...primaryInclusions.map((primary) => ({
+          [primary]: [].concat.apply(
+            [],
+            filter.include.map((inclusion) =>
+              inclusion.relation === primary &&
+              inclusion.scope &&
+              inclusion.scope.include
+                ? inclusion.scope.include
                     .filter(
                       (secondary) => secondary.scope && secondary.scope.where,
                     )
-                    .map(({relation}) => relation),
-                }
-              : {[inclusion.relation]: []},
+                    .map(({relation}) => relation)
+                : [],
+            ),
           ),
+        })),
       )
     : {};
+};
 
 /**
  * Filter result on primary relation
