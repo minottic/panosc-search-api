@@ -24,14 +24,14 @@
   "dependencies": {
     "compression": "^1.7.4",
     "cors": "^2.8.5",
-    "helmet": "^3.20.0",
+    "helmet": "^3.23.3",
     "loopback": "^3.26.0",
     "loopback-boot": "^3.3.1",
     "loopback-component-explorer": "^6.4.0",
     "mathjs": "^7.1.0",
     "serve-favicon": "^2.5.0",
     "strong-error-handler": "^3.5.0",
-    "superagent": "^5.2.2"
+    "superagent": "^5.3.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
