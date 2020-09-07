@@ -31,7 +31,7 @@
     "mathjs": "^7.1.0",
     "serve-favicon": "^2.5.0",
     "strong-error-handler": "^3.2.0",
-    "superagent": "^5.2.2"
+    "superagent": "^5.3.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
