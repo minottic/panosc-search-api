@@ -30,7 +30,7 @@
     "loopback-component-explorer": "^6.4.0",
     "mathjs": "^7.1.0",
     "serve-favicon": "^2.5.0",
-    "strong-error-handler": "^3.2.0",
+    "strong-error-handler": "^3.5.0",
     "superagent": "^5.3.1"
   },
   "devDependencies": {
