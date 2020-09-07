@@ -3,4 +3,4 @@
 ## Prerequisites
 
 - npm >= 6
-- node >= 8
+- node >= 10
