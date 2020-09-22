@@ -143,6 +143,9 @@ exports.document = async (scicatPublishedData, filter) => {
           } else {
             filter.where = {pid};
           }
+          if (scicatFilter.include) {
+            filter.include = scicatFilter.include;
+          }
           const datasets = await scicatDatasetService.find(filter);
           return datasets.length > 0 ? datasets[0] : {};
         }),
