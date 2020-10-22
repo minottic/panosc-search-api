@@ -1,0 +1,10 @@
+dist: trusty
+language: node_js
+node_js:
+  - '14.14'
+
+before_script:
+  - npm ci
+
+script:
+  - npm test
