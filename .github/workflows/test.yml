@@ -1,0 +1,17 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Unit tests
+        run: |
+          export BASE_URL=https://scicat.ess.eu/api/v3
+          npm ci
+          npm test
