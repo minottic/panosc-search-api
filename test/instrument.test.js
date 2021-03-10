@@ -84,6 +84,9 @@ describe('Instrument', () => {
         sandbox
           .stub(ScicatInstrumentService.prototype, 'find')
           .resolves(mockStubs.instrument.find.facilityFilter);
+        if (process.env.FACILITY) { 
+          sandbox.stub(process.env, 'FACILITY').value('ESS');
+        };
 
         const filter = JSON.stringify({
           where: {
