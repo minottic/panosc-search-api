@@ -204,7 +204,7 @@ exports.instrument = (scicatInstrument) => {
     ? {
         pid: scicatInstrument.pid,
         name: scicatInstrument.name,
-        facility: 'ESS',
+        facility: process.env.FACILITY || 'ESS',
       }
     : {};
 };
