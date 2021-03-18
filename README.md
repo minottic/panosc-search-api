@@ -16,8 +16,9 @@
 
 3. `npm install`
 
-4. Set the base url for your Catamel API either directly in _common/scicat-service.js_ or
+4. Set the ENV variables
    ```bash
-   export BASE_URL=<CATAMEL_API_BASE_URL>
+   export BASE_URL=<CATAMEL_API_BASE_URL> # e.g. https://scicat.ess.eu
+   export FACILITY=<YOUR_FACILITY> # e.g. ESS
    ```
 5. `npm start`
