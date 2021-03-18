@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-const math = require('mathjs');
+const math = require("mathjs");
 
 /**
  * Get inclusions from filter
@@ -11,12 +11,12 @@ const math = require('mathjs');
 exports.getInclusions = (filter) =>
   filter && filter.include
     ? Object.assign(
-        ...filter.include.map((inclusion) =>
-          inclusion.scope
-            ? {[inclusion.relation]: inclusion.scope}
-            : {[inclusion.relation]: {}},
-        ),
-      )
+      ...filter.include.map((inclusion) =>
+        inclusion.scope
+          ? { [inclusion.relation]: inclusion.scope }
+          : { [inclusion.relation]: {} },
+      ),
+    )
     : {};
 
 /**
@@ -28,12 +28,12 @@ exports.getInclusions = (filter) =>
 exports.getInclusionNames = (filter) => {
   const primaryInclusions = filter.include
     ? filter.include
-        .filter(
-          (primary) =>
-            (primary.scope && primary.scope.where) ||
+      .filter(
+        (primary) =>
+          (primary.scope && primary.scope.where) ||
             (primary.scope && primary.scope.include),
-        )
-        .map(({relation}) => relation)
+      )
+      .map(({ relation }) => relation)
     : [];
 
   return primaryInclusions.length > 0 &&
@@ -41,23 +41,23 @@ exports.getInclusionNames = (filter) => {
       (inclusion) => inclusion.scope && inclusion.scope.include,
     ).length > 0
     ? Object.assign(
-        ...primaryInclusions.map((primary) => ({
-          [primary]: [].concat.apply(
-            [],
-            filter.include.map((inclusion) =>
-              inclusion.relation === primary &&
+      ...primaryInclusions.map((primary) => ({
+        [primary]: [].concat.apply(
+          [],
+          filter.include.map((inclusion) =>
+            inclusion.relation === primary &&
               inclusion.scope &&
               inclusion.scope.include
-                ? inclusion.scope.include
-                    .filter(
-                      (secondary) => secondary.scope && secondary.scope.where,
-                    )
-                    .map(({relation}) => relation)
-                : [],
-            ),
+              ? inclusion.scope.include
+                .filter(
+                  (secondary) => secondary.scope && secondary.scope.where,
+                )
+                .map(({ relation }) => relation)
+              : [],
           ),
-        })),
-      )
+        ),
+      })),
+    )
     : {};
 };
 
@@ -93,10 +93,10 @@ exports.filterOnSecondary = (result, primary, secondary) =>
               : Object.keys(child[secondary]).length > 0,
           ).length > 0
             ? item[primary].filter((child) =>
-                Array.isArray(child[secondary])
-                  ? child[secondary].length > 0
-                  : Object.keys(child[secondary]).length > 0,
-              )
+              Array.isArray(child[secondary])
+                ? child[secondary].length > 0
+                : Object.keys(child[secondary]).length > 0,
+            )
             : null)
       : Object.keys(item[primary]).length > 0 &&
         item[primary].filter((child) =>
@@ -115,9 +115,9 @@ exports.filterOnSecondary = (result, primary, secondary) =>
 
 exports.convertToSI = (value, unit) => {
   const quantity = math.unit(value, unit).toSI().toString();
-  const convertedValue = quantity.substring(0, quantity.indexOf(' '));
-  const convertedUnit = quantity.substring(quantity.indexOf(' ') + 1);
-  return {valueSI: Number(convertedValue), unitSI: convertedUnit};
+  const convertedValue = quantity.substring(0, quantity.indexOf(" "));
+  const convertedUnit = quantity.substring(quantity.indexOf(" ") + 1);
+  return { valueSI: Number(convertedValue), unitSI: convertedUnit };
 };
 
 /**
@@ -130,10 +130,10 @@ exports.convertToSI = (value, unit) => {
 
 exports.convertToUnit = (value, unit, toUnit) => {
   const converted = math.unit(value, unit).to(toUnit);
-  const formatted = math.format(converted, {precision: 3}).toString();
-  const formattedValue = formatted.substring(0, formatted.indexOf(' '));
-  const formattedUnit = formatted.substring(formatted.indexOf(' ') + 1);
-  return {value: Number(formattedValue), unit: formattedUnit};
+  const formatted = math.format(converted, { precision: 3 }).toString();
+  const formattedValue = formatted.substring(0, formatted.indexOf(" "));
+  const formattedUnit = formatted.substring(formatted.indexOf(" ") + 1);
+  return { value: Number(formattedValue), unit: formattedUnit };
 };
 
 /**
@@ -145,28 +145,28 @@ exports.convertToUnit = (value, unit, toUnit) => {
 exports.extractParamaterFilter = (where) => {
   if (where && where.and) {
     const name = where.and.find((condition) =>
-      Object.keys(condition).includes('name'),
+      Object.keys(condition).includes("name"),
     )
-      ? where.and.find((condition) => Object.keys(condition).includes('name'))[
-          'name'
-        ]
+      ? where.and.find((condition) => Object.keys(condition).includes("name"))[
+        "name"
+      ]
       : null;
     const value = where.and.find((condition) =>
-      Object.keys(condition).includes('value'),
+      Object.keys(condition).includes("value"),
     )
-      ? where.and.find((condition) => Object.keys(condition).includes('value'))[
-          'value'
-        ]
+      ? where.and.find((condition) => Object.keys(condition).includes("value"))[
+        "value"
+      ]
       : null;
     const unit = where.and.find((condition) =>
-      Object.keys(condition).includes('unit'),
+      Object.keys(condition).includes("unit"),
     )
-      ? where.and.find((condition) => Object.keys(condition).includes('unit'))[
-          'unit'
-        ]
+      ? where.and.find((condition) => Object.keys(condition).includes("unit"))[
+        "unit"
+      ]
       : null;
-    return {name, value, unit};
+    return { name, value, unit };
   } else {
-    return {name: null, value: null, unit: null};
+    return { name: null, value: null, unit: null };
   }
 };

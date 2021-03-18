@@ -1,18 +1,18 @@
-'use strict';
+"use strict";
 
-const expect = require('chai').expect;
-const request = require('supertest');
-const sandbox = require('sinon').createSandbox();
+const expect = require("chai").expect;
+const request = require("supertest");
+const sandbox = require("sinon").createSandbox();
 
-const mockStubs = require('./MockStubs');
-const ScicatService = require('../common/scicat-service');
+const mockStubs = require("./MockStubs");
+const ScicatService = require("../common/scicat-service");
 const ScicatPubDataService = ScicatService.PublishedData;
 const ScicatDatasetService = ScicatService.Dataset;
 const ScicatSampleService = ScicatService.Sample;
 
 let app;
 before((done) => {
-  app = require('../server/server');
+  app = require("../server/server");
   done();
 });
 
@@ -21,62 +21,62 @@ afterEach((done) => {
   done();
 });
 
-describe('Document', () => {
-  const requestUrl = '/panosc-api/Documents';
-  describe('GET /documents', () => {
-    context('without filter', () => {
-      it('should return an array of documents', (done) => {
+describe("Document", () => {
+  const requestUrl = "/panosc-api/Documents";
+  describe("GET /documents", () => {
+    context("without filter", () => {
+      it("should return an array of documents", (done) => {
         sandbox
-          .stub(ScicatPubDataService.prototype, 'find')
+          .stub(ScicatPubDataService.prototype, "find")
           .resolves(mockStubs.publishedData.find.noFilter);
 
         request(app)
           .get(requestUrl)
-          .set('Accept', 'application/json')
+          .set("Accept", "application/json")
           .expect(200)
-          .expect('Content-Type', /json/)
+          .expect("Content-Type", /json/)
           .end((err, res) => {
             if (err) throw err;
 
-            expect(res.body).to.be.an('array');
+            expect(res.body).to.be.an("array");
             res.body.forEach((document) => {
-              expect(document).to.have.property('pid');
-              expect(document).to.have.property('isPublic');
-              expect(document).to.have.property('type');
-              expect(document).to.have.property('title');
-              expect(document).to.have.property('score');
+              expect(document).to.have.property("pid");
+              expect(document).to.have.property("isPublic");
+              expect(document).to.have.property("type");
+              expect(document).to.have.property("title");
+              expect(document).to.have.property("score");
             });
             done();
           });
       });
     });
 
-    context('where type is publication and person is James Chadwick', () => {
-      it('should return an array of documents matching the type and the person', (done) => {
+    context("where type is publication and person is James Chadwick", () => {
+      it("should return an array of documents matching the type and the person", (done) => {
         sandbox
-          .stub(ScicatPubDataService.prototype, 'find')
+          .stub(ScicatPubDataService.prototype, "find")
           .resolves(mockStubs.publishedData.find.personFilter);
-        const callback = sandbox.stub(ScicatDatasetService.prototype, 'find');
+        const callback = sandbox.stub(ScicatDatasetService.prototype, "find");
         callback.onCall(0).resolves(mockStubs.dataset.find.personFilter[0]);
         callback.onCall(1).resolves(mockStubs.dataset.find.personFilter[1]);
 
         const filter = JSON.stringify({
           where: {
-            type: 'publication',
+            type: "publication",
           },
           include: [
             {
-              relation: 'datasets',
+              relation: "datasets",
             },
             {
-              relation: 'members',
+              relation: "members",
               scope: {
                 include: [
                   {
-                    relation: 'person',
+                    relation: "person",
                     scope: {
                       where: {
-                        fullName: 'James Chadwick',
+                        fullName: "James Chadwick",
                       },
                     },
                   },
@@ -86,26 +86,26 @@ describe('Document', () => {
           ],
         });
         request(app)
-          .get(requestUrl + '?filter=' + filter)
-          .set('Accept', 'application/json')
+          .get(requestUrl + "?filter=" + filter)
+          .set("Accept", "application/json")
           .expect(200)
-          .expect('Content-Type', /json/)
+          .expect("Content-Type", /json/)
           .end((err, res) => {
             if (err) throw err;
 
-            expect(res.body).to.be.an('array');
+            expect(res.body).to.be.an("array");
             res.body.forEach((document) => {
-              expect(document).to.have.property('pid');
-              expect(document).to.have.property('isPublic');
-              expect(document).to.have.property('type');
-              expect(document).to.have.property('title');
-              expect(document).to.have.property('score');
-              expect(document).to.have.property('datasets');
-              expect(document.datasets).to.be.an('array').and.not.empty;
-              expect(document).to.have.property('members');
-              expect(document.members).to.be.an('array').and.not.empty;
+              expect(document).to.have.property("pid");
+              expect(document).to.have.property("isPublic");
+              expect(document).to.have.property("type");
+              expect(document).to.have.property("title");
+              expect(document).to.have.property("score");
+              expect(document).to.have.property("datasets");
+              expect(document.datasets).to.be.an("array").and.not.empty;
+              expect(document).to.have.property("members");
+              expect(document.members).to.be.an("array").and.not.empty;
               document.members.forEach((member) => {
-                expect(member.person.fullName).to.equal('James Chadwick');
+                expect(member.person.fullName).to.equal("James Chadwick");
               });
             });
             done();
@@ -114,20 +114,20 @@ describe('Document', () => {
     });
 
     context(
-      'where parameters has a wavelength in the range 1000-1100 nm',
+      "where parameters has a wavelength in the range 1000-1100 nm",
       () => {
-        it('should return an array of documents matching the parameter', (done) => {
-          sandbox.stub(ScicatPubDataService.prototype, 'find').resolves([]);
+        it("should return an array of documents matching the parameter", (done) => {
+          sandbox.stub(ScicatPubDataService.prototype, "find").resolves([]);
 
           const filter = JSON.stringify({
             include: [
               {
-                relation: 'parameters',
+                relation: "parameters",
                 scope: {
                   where: {
                     and: [
                       {
-                        name: 'wavelength',
+                        name: "wavelength",
                       },
                       {
                         value: {
@@ -135,7 +135,7 @@ describe('Document', () => {
                         },
                       },
                       {
-                        unit: 'nm',
+                        unit: "nm",
                       },
                     ],
                   },
@@ -144,26 +144,26 @@ describe('Document', () => {
             ],
           });
           request(app)
-            .get(requestUrl + '?filter=' + filter)
-            .set('Accept', 'application/json')
+            .get(requestUrl + "?filter=" + filter)
+            .set("Accept", "application/json")
             .expect(200)
-            .expect('Content-Type', /json/)
+            .expect("Content-Type", /json/)
             .end((err, res) => {
               if (err) throw err;
 
-              expect(res.body).to.be.an('array');
+              expect(res.body).to.be.an("array");
               res.body.forEach((document) => {
-                expect(document).to.have.property('pid');
-                expect(document).to.have.property('isPublic');
-                expect(document).to.have.property('type');
-                expect(document).to.have.property('title');
-                expect(document).to.have.property('score');
-                expect(document).to.have.property('parameters');
-                expect(document.parameters).to.be.an('array').and.not.empty;
+                expect(document).to.have.property("pid");
+                expect(document).to.have.property("isPublic");
+                expect(document).to.have.property("type");
+                expect(document).to.have.property("title");
+                expect(document).to.have.property("score");
+                expect(document).to.have.property("parameters");
+                expect(document.parameters).to.be.an("array").and.not.empty;
                 document.parameters.forEach((parameter) => {
-                  expect(parameter.name).to.equal('wavelength');
+                  expect(parameter.name).to.equal("wavelength");
                   expect(parameter.value).to.be.within(1000, 1100);
-                  expect(parameter.unit).to.equal('nm');
+                  expect(parameter.unit).to.equal("nm");
                 });
               });
               done();
@@ -173,13 +173,13 @@ describe('Document', () => {
     );
 
     context(
-      'where dataset parameters has a wavelength in the range 1000-1100 nm',
+      "where dataset parameters has a wavelength in the range 1000-1100 nm",
       () => {
-        it('should return an array of documents with datasets matching the parameter', (done) => {
+        it("should return an array of documents with datasets matching the parameter", (done) => {
           sandbox
-            .stub(ScicatPubDataService.prototype, 'find')
+            .stub(ScicatPubDataService.prototype, "find")
             .resolves(mockStubs.publishedData.find.noFilter);
-          const callback = sandbox.stub(ScicatDatasetService.prototype, 'find');
+          const callback = sandbox.stub(ScicatDatasetService.prototype, "find");
           callback
             .onCall(0)
             .resolves(mockStubs.dataset.find.wavelengthFilter[0]);
@@ -196,16 +196,16 @@ describe('Document', () => {
           const filter = JSON.stringify({
             include: [
               {
-                relation: 'datasets',
+                relation: "datasets",
                 scope: {
                   include: [
                     {
-                      relation: 'parameters',
+                      relation: "parameters",
                       scope: {
                         where: {
                           and: [
                             {
-                              name: 'wavelength',
+                              name: "wavelength",
                             },
                             {
                               value: {
@@ -213,7 +213,7 @@ describe('Document', () => {
                               },
                             },
                             {
-                              unit: 'nm',
+                              unit: "nm",
                             },
                           ],
                         },
@@ -225,29 +225,29 @@ describe('Document', () => {
             ],
           });
           request(app)
-            .get(requestUrl + '?filter=' + filter)
-            .set('Accept', 'application/json')
+            .get(requestUrl + "?filter=" + filter)
+            .set("Accept", "application/json")
             .expect(200)
-            .expect('Content-Type', /json/)
+            .expect("Content-Type", /json/)
             .end((err, res) => {
               if (err) throw err;
 
-              expect(res.body).to.be.an('array');
+              expect(res.body).to.be.an("array");
               res.body.forEach((document) => {
-                expect(document).to.have.property('pid');
-                expect(document).to.have.property('isPublic');
-                expect(document).to.have.property('type');
-                expect(document).to.have.property('title');
-                expect(document).to.have.property('score');
-                expect(document).to.have.property('datasets');
-                expect(document.datasets).to.be.an('array').and.not.empty;
+                expect(document).to.have.property("pid");
+                expect(document).to.have.property("isPublic");
+                expect(document).to.have.property("type");
+                expect(document).to.have.property("title");
+                expect(document).to.have.property("score");
+                expect(document).to.have.property("datasets");
+                expect(document.datasets).to.be.an("array").and.not.empty;
                 document.datasets.forEach((dataset) => {
-                  expect(dataset).to.have.property('parameters');
-                  expect(dataset.parameters).to.be.an('array').and.not.empty;
+                  expect(dataset).to.have.property("parameters");
+                  expect(dataset.parameters).to.be.an("array").and.not.empty;
                   dataset.parameters.forEach((parameter) => {
-                    expect(parameter.name).to.equal('wavelength');
+                    expect(parameter.name).to.equal("wavelength");
                     expect(parameter.value).to.be.within(1000, 1100);
-                    expect(parameter.unit).to.equal('nm');
+                    expect(parameter.unit).to.equal("nm");
                   });
                 });
               });
@@ -258,13 +258,13 @@ describe('Document', () => {
     );
 
     context(
-      'where datasets are using technique x-ray absorption and sample is solid copper cylinder',
+      "where datasets are using technique x-ray absorption and sample is solid copper cylinder",
       () => {
-        it('should return an array of documents with datasets using the technique and sample', (done) => {
+        it("should return an array of documents with datasets using the technique and sample", (done) => {
           sandbox
-            .stub(ScicatPubDataService.prototype, 'find')
+            .stub(ScicatPubDataService.prototype, "find")
             .resolves(mockStubs.publishedData.find.noFilter);
-          const callback = sandbox.stub(ScicatDatasetService.prototype, 'find');
+          const callback = sandbox.stub(ScicatDatasetService.prototype, "find");
           callback
             .onCall(0)
             .resolves(mockStubs.dataset.find.techniqueSampleFilter[0]);
@@ -279,28 +279,28 @@ describe('Document', () => {
             .resolves(mockStubs.dataset.find.techniqueSampleFilter[3]);
 
           sandbox
-            .stub(ScicatSampleService.prototype, 'find')
+            .stub(ScicatSampleService.prototype, "find")
             .resolves(mockStubs.sample.find);
 
           const filter = JSON.stringify({
             include: [
               {
-                relation: 'datasets',
+                relation: "datasets",
                 scope: {
                   include: [
                     {
-                      relation: 'samples',
+                      relation: "samples",
                       scope: {
                         where: {
-                          name: 'solid copper cylinder',
+                          name: "solid copper cylinder",
                         },
                       },
                     },
                     {
-                      relation: 'techniques',
+                      relation: "techniques",
                       scope: {
                         where: {
-                          name: 'x-ray absorption',
+                          name: "x-ray absorption",
                         },
                       },
                     },
@@ -310,32 +310,32 @@ describe('Document', () => {
             ],
           });
           request(app)
-            .get(requestUrl + '?filter=' + filter)
-            .set('Accept', 'application/json')
+            .get(requestUrl + "?filter=" + filter)
+            .set("Accept", "application/json")
             .expect(200)
-            .expect('Content-Type', /json/)
+            .expect("Content-Type", /json/)
             .end((err, res) => {
               if (err) throw err;
 
-              expect(res.body).to.be.an('array');
+              expect(res.body).to.be.an("array");
               res.body.forEach((document) => {
-                expect(document).to.have.property('pid');
-                expect(document).to.have.property('isPublic');
-                expect(document).to.have.property('type');
-                expect(document).to.have.property('title');
-                expect(document).to.have.property('score');
-                expect(document).to.have.property('datasets');
-                expect(document.datasets).to.be.an('array').and.not.empty;
+                expect(document).to.have.property("pid");
+                expect(document).to.have.property("isPublic");
+                expect(document).to.have.property("type");
+                expect(document).to.have.property("title");
+                expect(document).to.have.property("score");
+                expect(document).to.have.property("datasets");
+                expect(document.datasets).to.be.an("array").and.not.empty;
                 document.datasets.forEach((dataset) => {
-                  expect(dataset).to.have.property('samples');
-                  expect(dataset.samples).to.be.an('array').and.not.empty;
+                  expect(dataset).to.have.property("samples");
+                  expect(dataset.samples).to.be.an("array").and.not.empty;
                   dataset.samples.forEach((sample) => {
-                    expect(sample.name).to.equal('solid copper cylinder');
+                    expect(sample.name).to.equal("solid copper cylinder");
                   });
-                  expect(dataset).to.have.property('techniques');
-                  expect(dataset.techniques).to.be.an('array').and.not.empty;
+                  expect(dataset).to.have.property("techniques");
+                  expect(dataset.techniques).to.be.an("array").and.not.empty;
                   dataset.techniques.forEach((technique) => {
-                    expect(technique.name).to.equal('x-ray absorption');
+                    expect(technique.name).to.equal("x-ray absorption");
                   });
                 });
               });
@@ -345,40 +345,40 @@ describe('Document', () => {
       },
     );
 
-    context('where datasets have a file matching text `file1`', () => {
-      xit('should return an array of documents with datasets and files matching the query', (done) => {
+    context("where datasets have a file matching text `file1`", () => {
+      xit("should return an array of documents with datasets and files matching the query", (done) => {
         const filter = JSON.stringify({
           include: [
             {
-              relation: 'datasets',
+              relation: "datasets",
               scope: {
-                include: [{relation: 'files', scope: {where: {text: 'file1'}}}],
+                include: [{ relation: "files", scope: { where: { text: "file1" } } }],
               },
             },
           ],
         });
         request(app)
-          .get(requestUrl + '?filter=' + filter)
-          .set('Accept', 'application/json')
+          .get(requestUrl + "?filter=" + filter)
+          .set("Accept", "application/json")
           .expect(200)
-          .expect('Content-Type', /json/)
+          .expect("Content-Type", /json/)
           .end((err, res) => {
             if (err) throw err;
 
-            expect(res.body).to.be.an('array');
+            expect(res.body).to.be.an("array");
             res.body.forEach((document) => {
-              expect(document).to.have.property('pid');
-              expect(document).to.have.property('isPublic');
-              expect(document).to.have.property('type');
-              expect(document).to.have.property('title');
-              expect(document).to.have.property('score');
-              expect(document).to.have.property('datasets');
-              expect(document.datasets).to.be.an('array').and.not.empty;
+              expect(document).to.have.property("pid");
+              expect(document).to.have.property("isPublic");
+              expect(document).to.have.property("type");
+              expect(document).to.have.property("title");
+              expect(document).to.have.property("score");
+              expect(document).to.have.property("datasets");
+              expect(document.datasets).to.be.an("array").and.not.empty;
               document.datasets.forEach((dataset) => {
-                expect(dataset).to.have.property('files');
-                expect(dataset.files).to.be.an('array').and.not.empty;
+                expect(dataset).to.have.property("files");
+                expect(dataset.files).to.be.an("array").and.not.empty;
                 dataset.files.forEach((file) => {
-                  expect(file.name).to.include('file1');
+                  expect(file.name).to.include("file1");
                 });
               });
             });
@@ -388,26 +388,26 @@ describe('Document', () => {
     });
   });
 
-  describe('GET /documents/{id}', () => {
-    it('should return the document with the requested pid', (done) => {
+  describe("GET /documents/{id}", () => {
+    it("should return the document with the requested pid", (done) => {
       sandbox
-        .stub(ScicatPubDataService.prototype, 'findById')
+        .stub(ScicatPubDataService.prototype, "findById")
         .resolves(mockStubs.publishedData.findById);
 
-      const pid = '10.5072/panosc-test-publication1';
+      const pid = "10.5072/panosc-test-publication1";
       request(app)
-        .get(requestUrl + '/' + encodeURIComponent(pid))
-        .set('Accept', 'application/json')
+        .get(requestUrl + "/" + encodeURIComponent(pid))
+        .set("Accept", "application/json")
         .expect(200)
-        .expect('Content-Type', /json/)
+        .expect("Content-Type", /json/)
         .end((err, res) => {
           if (err) throw err;
 
-          expect(res.body).to.have.property('pid');
-          expect(res.body['pid']).to.equal(pid);
-          expect(res.body).to.have.property('isPublic');
-          expect(res.body).to.have.property('type');
-          expect(res.body).to.have.property('title');
+          expect(res.body).to.have.property("pid");
+          expect(res.body["pid"]).to.equal(pid);
+          expect(res.body).to.have.property("isPublic");
+          expect(res.body).to.have.property("type");
+          expect(res.body).to.have.property("title");
           done();
         });
     });

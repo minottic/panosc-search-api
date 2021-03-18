@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
-const superagent = require('superagent');
+const superagent = require("superagent");
 
-const baseUrl = process.env.BASE_URL || 'http://localhost:3030/api/v3';
+const baseUrl = process.env.BASE_URL || "http://localhost:3030/api/v3";
 
 exports.Dataset = class {
   /**
@@ -12,17 +12,13 @@ exports.Dataset = class {
    */
 
   async find(filter) {
-    try {
-      const jsonFilter = JSON.stringify(filter);
-      console.log('>>> Dataset.find filter', jsonFilter);
-      const url = jsonFilter
-        ? baseUrl + '/Datasets?filter=' + jsonFilter
-        : baseUrl + '/Datasets';
-      const res = await superagent.get(url);
-      return JSON.parse(res.text);
-    } catch (err) {
-      throw err;
-    }
+    const jsonFilter = JSON.stringify(filter);
+    console.log(">>> Dataset.find filter", jsonFilter);
+    const url = jsonFilter
+      ? baseUrl + "/Datasets?filter=" + jsonFilter
+      : baseUrl + "/Datasets";
+    const res = await superagent.get(url);
+    return JSON.parse(res.text);
   }
 
   /**
@@ -33,19 +29,15 @@ exports.Dataset = class {
    */
 
   async findById(id, filter) {
-    try {
-      const encodedId = encodeURIComponent(id);
-      const jsonFilter = JSON.stringify(filter);
-      console.log('>>> Dataset.findById pid', encodedId);
-      console.log('>>> Dataset.findById filter', jsonFilter);
-      const url = jsonFilter
-        ? baseUrl + '/Datasets/' + encodedId + '?filter=' + jsonFilter
-        : baseUrl + '/Datasets/' + encodedId;
-      const res = await superagent.get(url);
-      return JSON.parse(res.text);
-    } catch (err) {
-      throw err;
-    }
+    const encodedId = encodeURIComponent(id);
+    const jsonFilter = JSON.stringify(filter);
+    console.log(">>> Dataset.findById pid", encodedId);
+    console.log(">>> Dataset.findById filter", jsonFilter);
+    const url = jsonFilter
+      ? baseUrl + "/Datasets/" + encodedId + "?filter=" + jsonFilter
+      : baseUrl + "/Datasets/" + encodedId;
+    const res = await superagent.get(url);
+    return JSON.parse(res.text);
   }
 
   /**
@@ -55,18 +47,14 @@ exports.Dataset = class {
    */
 
   async count(filter) {
-    try {
-      const jsonFilter = JSON.stringify(filter);
-      console.log('>>> Dataset.count filter', jsonFilter);
-      const url = jsonFilter
-        ? baseUrl + '/Datasets?filter=' + jsonFilter
-        : baseUrl + '/Datasets';
-      const res = await superagent.get(url);
-      const datasets = JSON.parse(res.text);
-      return {count: datasets.length};
-    } catch (err) {
-      throw err;
-    }
+    const jsonFilter = JSON.stringify(filter);
+    console.log(">>> Dataset.count filter", jsonFilter);
+    const url = jsonFilter
+      ? baseUrl + "/Datasets?filter=" + jsonFilter
+      : baseUrl + "/Datasets";
+    const res = await superagent.get(url);
+    const datasets = JSON.parse(res.text);
+    return { count: datasets.length };
   }
 
   /**
@@ -77,19 +65,15 @@ exports.Dataset = class {
    */
 
   async findByIdFiles(id, filter) {
-    try {
-      const encodedId = encodeURIComponent(id);
-      const jsonFilter = JSON.stringify(filter);
-      console.log('>>> Dataset.findByIdFiles pid', encodedId);
-      console.log('>>> Dataset.findByIdFiles filter', jsonFilter);
-      const url = jsonFilter
-        ? baseUrl + '/Datasets/' + encodedId + '?filter=' + jsonFilter
-        : baseUrl + '/Datasets/' + encodedId;
-      const res = await superagent.get(url);
-      return JSON.parse(res.text)['origdatablocks'];
-    } catch (err) {
-      throw err;
-    }
+    const encodedId = encodeURIComponent(id);
+    const jsonFilter = JSON.stringify(filter);
+    console.log(">>> Dataset.findByIdFiles pid", encodedId);
+    console.log(">>> Dataset.findByIdFiles filter", jsonFilter);
+    const url = jsonFilter
+      ? baseUrl + "/Datasets/" + encodedId + "?filter=" + jsonFilter
+      : baseUrl + "/Datasets/" + encodedId;
+    const res = await superagent.get(url);
+    return JSON.parse(res.text)["origdatablocks"];
   }
 };
 
@@ -101,17 +85,13 @@ exports.PublishedData = class {
    */
 
   async find(filter) {
-    try {
-      const jsonFilter = JSON.stringify(filter);
-      console.log('>>> PublishedData.find filter', jsonFilter);
-      const url = jsonFilter
-        ? baseUrl + '/PublishedData?filter=' + jsonFilter
-        : baseUrl + '/PublishedData';
-      const res = await superagent.get(url);
-      return JSON.parse(res.text);
-    } catch (err) {
-      throw err;
-    }
+    const jsonFilter = JSON.stringify(filter);
+    console.log(">>> PublishedData.find filter", jsonFilter);
+    const url = jsonFilter
+      ? baseUrl + "/PublishedData?filter=" + jsonFilter
+      : baseUrl + "/PublishedData";
+    const res = await superagent.get(url);
+    return JSON.parse(res.text);
   }
 
   /**
@@ -122,19 +102,15 @@ exports.PublishedData = class {
    */
 
   async findById(id, filter) {
-    try {
-      const encodedId = encodeURIComponent(id);
-      const jsonFilter = JSON.stringify(filter);
-      console.log('>>> PublishedData.findById pid', encodedId);
-      console.log('>>> PublishedData.findById filter', jsonFilter);
-      const url = jsonFilter
-        ? baseUrl + '/PublishedData/' + encodedId + '?filter=' + jsonFilter
-        : baseUrl + '/PublishedData/' + encodedId;
-      const res = await superagent.get(url);
-      return JSON.parse(res.text);
-    } catch (err) {
-      throw err;
-    }
+    const encodedId = encodeURIComponent(id);
+    const jsonFilter = JSON.stringify(filter);
+    console.log(">>> PublishedData.findById pid", encodedId);
+    console.log(">>> PublishedData.findById filter", jsonFilter);
+    const url = jsonFilter
+      ? baseUrl + "/PublishedData/" + encodedId + "?filter=" + jsonFilter
+      : baseUrl + "/PublishedData/" + encodedId;
+    const res = await superagent.get(url);
+    return JSON.parse(res.text);
   }
 
   /**
@@ -144,17 +120,13 @@ exports.PublishedData = class {
    */
 
   async count(where) {
-    try {
-      const jsonWhere = JSON.stringify(where);
-      console.log('>>> PublishedData.count where', jsonWhere);
-      const url = jsonWhere
-        ? baseUrl + '/PublishedData/count?where=' + jsonWhere
-        : baseUrl + '/PublishedData/count';
-      const res = await superagent.get(url);
-      return JSON.parse(res.text);
-    } catch (err) {
-      throw err;
-    }
+    const jsonWhere = JSON.stringify(where);
+    console.log(">>> PublishedData.count where", jsonWhere);
+    const url = jsonWhere
+      ? baseUrl + "/PublishedData/count?where=" + jsonWhere
+      : baseUrl + "/PublishedData/count";
+    const res = await superagent.get(url);
+    return JSON.parse(res.text);
   }
 };
 
@@ -166,17 +138,13 @@ exports.Instrument = class {
    */
 
   async find(filter) {
-    try {
-      const jsonFilter = JSON.stringify(filter);
-      console.log('>>> Instrument.find filter', jsonFilter);
-      const url = jsonFilter
-        ? baseUrl + '/Instruments?filter=' + jsonFilter
-        : baseUrl + '/Instruments';
-      const res = await superagent.get(url);
-      return JSON.parse(res.text);
-    } catch (err) {
-      throw err;
-    }
+    const jsonFilter = JSON.stringify(filter);
+    console.log(">>> Instrument.find filter", jsonFilter);
+    const url = jsonFilter
+      ? baseUrl + "/Instruments?filter=" + jsonFilter
+      : baseUrl + "/Instruments";
+    const res = await superagent.get(url);
+    return JSON.parse(res.text);
   }
 
   /**
@@ -187,19 +155,15 @@ exports.Instrument = class {
    */
 
   async findById(id, filter) {
-    try {
-      const encodedId = encodeURIComponent(id);
-      const jsonFilter = JSON.stringify(filter);
-      console.log('>>> Instrument.findById id', encodedId);
-      console.log('>>> Instrument.findById filter', jsonFilter);
-      const url = jsonFilter
-        ? baseUrl + '/Instruments/' + encodedId + '?filter=' + jsonFilter
-        : baseUrl + '/Instruments/' + encodedId;
-      const res = await superagent.get(url);
-      return JSON.parse(res.text);
-    } catch (err) {
-      throw err;
-    }
+    const encodedId = encodeURIComponent(id);
+    const jsonFilter = JSON.stringify(filter);
+    console.log(">>> Instrument.findById id", encodedId);
+    console.log(">>> Instrument.findById filter", jsonFilter);
+    const url = jsonFilter
+      ? baseUrl + "/Instruments/" + encodedId + "?filter=" + jsonFilter
+      : baseUrl + "/Instruments/" + encodedId;
+    const res = await superagent.get(url);
+    return JSON.parse(res.text);
   }
 
   /**
@@ -209,17 +173,13 @@ exports.Instrument = class {
    */
 
   async count(where) {
-    try {
-      const jsonWhere = JSON.stringify(where);
-      console.log('>>> Instrument.count where', jsonWhere);
-      const url = jsonWhere
-        ? baseUrl + '/Instruments/count?where=' + jsonWhere
-        : baseUrl + '/Instruments/count';
-      const res = await superagent.get(url);
-      return JSON.parse(res.text);
-    } catch (err) {
-      throw err;
-    }
+    const jsonWhere = JSON.stringify(where);
+    console.log(">>> Instrument.count where", jsonWhere);
+    const url = jsonWhere
+      ? baseUrl + "/Instruments/count?where=" + jsonWhere
+      : baseUrl + "/Instruments/count";
+    const res = await superagent.get(url);
+    return JSON.parse(res.text);
   }
 };
 
@@ -231,16 +191,12 @@ exports.Sample = class {
    */
 
   async find(filter) {
-    try {
-      const jsonFilter = JSON.stringify(filter);
-      console.log('>>> Sample.find filter', jsonFilter);
-      const url = jsonFilter
-        ? baseUrl + '/Samples?filter=' + jsonFilter
-        : baseUrl + '/Samples';
-      const res = await superagent.get(url);
-      return JSON.parse(res.text);
-    } catch (err) {
-      throw err;
-    }
+    const jsonFilter = JSON.stringify(filter);
+    console.log(">>> Sample.find filter", jsonFilter);
+    const url = jsonFilter
+      ? baseUrl + "/Samples?filter=" + jsonFilter
+      : baseUrl + "/Samples";
+    const res = await superagent.get(url);
+    return JSON.parse(res.text);
   }
 };

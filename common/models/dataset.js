@@ -1,11 +1,11 @@
-'use strict';
+"use strict";
 
-const ScicatService = require('../scicat-service');
+const ScicatService = require("../scicat-service");
 const scicatDatasetService = new ScicatService.Dataset();
 
-const filterMapper = require('../filter-mapper');
-const responseMapper = require('../response-mapper');
-const utils = require('../utils');
+const filterMapper = require("../filter-mapper");
+const responseMapper = require("../response-mapper");
+const utils = require("../utils");
 
 module.exports = function (Dataset) {
   /**
@@ -14,17 +14,13 @@ module.exports = function (Dataset) {
    */
 
   Dataset.find = async function (filter) {
-    try {
-      const scicatFilter = filterMapper.dataset(filter);
-      const datasets = await scicatDatasetService.find(scicatFilter);
-      return await Promise.all(
-        datasets.map(
-          async (dataset) => await responseMapper.dataset(dataset, filter),
-        ),
-      );
-    } catch (err) {
-      throw err;
-    }
+    const scicatFilter = filterMapper.dataset(filter);
+    const datasets = await scicatDatasetService.find(scicatFilter);
+    return await Promise.all(
+      datasets.map(
+        async (dataset) => await responseMapper.dataset(dataset, filter),
+      ),
+    );
   };
 
   /**
@@ -34,13 +30,9 @@ module.exports = function (Dataset) {
    */
 
   Dataset.findById = async function (id, filter) {
-    try {
-      const scicatFilter = filterMapper.dataset(filter);
-      const dataset = await scicatDatasetService.findById(id, scicatFilter);
-      return await responseMapper.dataset(dataset, filter);
-    } catch (err) {
-      throw err;
-    }
+    const scicatFilter = filterMapper.dataset(filter);
+    const dataset = await scicatDatasetService.findById(id, scicatFilter);
+    return await responseMapper.dataset(dataset, filter);
   };
 
   /**
@@ -49,12 +41,8 @@ module.exports = function (Dataset) {
    */
 
   Dataset.count = async function (where) {
-    try {
-      const scicatFilter = filterMapper.dataset({where});
-      return await scicatDatasetService.count(scicatFilter);
-    } catch (err) {
-      throw err;
-    }
+    const scicatFilter = filterMapper.dataset({ where });
+    return await scicatDatasetService.count(scicatFilter);
   };
 
   /**
@@ -64,16 +52,12 @@ module.exports = function (Dataset) {
    */
 
   Dataset.findByIdFiles = async function (id, filter) {
-    try {
-      const scicatFilter = filterMapper.files(filter);
-      const origDatablocks = await scicatDatasetService.findByIdFiles(
-        id,
-        scicatFilter,
-      );
-      return responseMapper.files(origDatablocks);
-    } catch (err) {
-      throw err;
-    }
+    const scicatFilter = filterMapper.files(filter);
+    const origDatablocks = await scicatDatasetService.findByIdFiles(
+      id,
+      scicatFilter,
+    );
+    return responseMapper.files(origDatablocks);
   };
 
   /**
@@ -83,20 +67,16 @@ module.exports = function (Dataset) {
    */
 
   Dataset.countFiles = async function (id, where) {
-    try {
-      const scicatFilter = filterMapper.files({where});
-      const origDatablocks = await scicatDatasetService.findByIdFiles(
-        id,
-        scicatFilter,
-      );
-      const files = responseMapper.files(origDatablocks);
-      return {count: files.length};
-    } catch (err) {
-      throw err;
-    }
+    const scicatFilter = filterMapper.files({ where });
+    const origDatablocks = await scicatDatasetService.findByIdFiles(
+      id,
+      scicatFilter,
+    );
+    const files = responseMapper.files(origDatablocks);
+    return { count: files.length };
   };
 
-  Dataset.afterRemote('find', (ctx, result, next) => {
+  Dataset.afterRemote("find", (ctx, result, next) => {
     const filter = ctx.args.filter ? ctx.args.filter : {};
     const inclusions = utils.getInclusionNames(filter);
 

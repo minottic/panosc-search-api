@@ -11,10 +11,10 @@
     "node": ">=8"
   },
   "scripts": {
-    "lint": "eslint .",
+    "lint": "eslint --fix .",
     "start": "node .",
     "test": "mocha --timeout=30000 --exit",
-    "posttest": "npm run lint"
+    "posttest": "eslint ."
   },
   "repository": {
     "type": "git"
@@ -35,10 +35,9 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "eslint": "^6.1.0",
+    "eslint": "^6.8.0",
     "eslint-config-loopback": "^13.1.0",
     "mocha": "^6.2.0",
-    "prettier": "^2.0.5",
     "sinon": "^9.0.2",
     "supertest": "^4.0.2"
   }
