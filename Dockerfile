@@ -1,27 +1,32 @@
-# Check out https://hub.docker.com/_/node to select a new base image
 FROM node:14-alpine
 
-# Set to a non-root built-in user `node`
+RUN apk update && apk ugrade
+
+ARG BASE_URL="https://scicat.ess.eu/api/v3"
+ARG FACILITY="ESS"
+
+ENV NODE_ENV="production"
+ENV BASE_URL=${BASE_URL}
+ENV FACILITY=${FACILITY}
+
+# Prepare app directory
+WORKDIR /home/node/app
+COPY package*.json /home/node/app/
+COPY .snyk /home/node/app/
+
+# Set up local user to avoid running as root
+RUN chown -R node:node /home/node/app
 USER node
 
-# Create app directory (with user `node`)
-RUN mkdir -p /home/node/app
-
-WORKDIR /home/node/app
-
 # Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-COPY --chown=node package*.json ./
-COPY --chown=node .snyk ./
-
 RUN npm ci --only=production
 
 # Bundle app source code
-COPY --chown=node . .
+COPY --chown=node:node . /home/node/app/
 
 # Bind to all network interfaces so that it can be mapped to the host OS
 ENV HOST=0.0.0.0 PORT=3000
-
 EXPOSE ${PORT}
+
+# Start the app
 CMD [ "node", "." ]
