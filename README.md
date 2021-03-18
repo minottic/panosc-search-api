@@ -18,7 +18,7 @@
 
 4. Set the ENV variables
    ```bash
-   export BASE_URL=<CATAMEL_API_BASE_URL> # e.g. https://scicat.ess.eu
+   export BASE_URL=<CATAMEL_API_BASE_URL> # e.g. https://scicat.ess.eu/api/v3
    export FACILITY=<YOUR_FACILITY> # e.g. ESS
    ```
 5. `npm start`
