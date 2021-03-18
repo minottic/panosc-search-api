@@ -11,7 +11,7 @@
     "node": ">=8"
   },
   "scripts": {
-    "lint": "eslint .",
+    "lint": "eslint --fix .",
     "start": "node .",
     "test": "mocha --timeout=30000 --exit",
     "posttest": "npm run lint"
