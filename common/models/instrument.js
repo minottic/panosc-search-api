@@ -1,11 +1,11 @@
-'use strict';
+"use strict";
 
-const ScicatService = require('../scicat-service');
+const ScicatService = require("../scicat-service");
 const scicatInstrumentService = new ScicatService.Instrument();
 
-const filterMapper = require('../filter-mapper');
-const responseMapper = require('../response-mapper');
-const utils = require('../utils');
+const filterMapper = require("../filter-mapper");
+const responseMapper = require("../response-mapper");
+const utils = require("../utils");
 
 module.exports = function (Instrument) {
   /**
@@ -51,14 +51,14 @@ module.exports = function (Instrument) {
 
   Instrument.count = async function (where) {
     try {
-      const scicatFilter = filterMapper.instrument({where});
+      const scicatFilter = filterMapper.instrument({ where });
       return await scicatInstrumentService.count(scicatFilter.where);
     } catch (err) {
       throw err;
     }
   };
 
-  Instrument.afterRemote('find', (ctx, result, next) => {
+  Instrument.afterRemote("find", (ctx, result, next) => {
     const filter = ctx.args.filter ? ctx.args.filter : {};
     const inclusions = utils.getInclusionNames(filter);
 

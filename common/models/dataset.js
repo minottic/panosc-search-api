@@ -1,11 +1,11 @@
-'use strict';
+"use strict";
 
-const ScicatService = require('../scicat-service');
+const ScicatService = require("../scicat-service");
 const scicatDatasetService = new ScicatService.Dataset();
 
-const filterMapper = require('../filter-mapper');
-const responseMapper = require('../response-mapper');
-const utils = require('../utils');
+const filterMapper = require("../filter-mapper");
+const responseMapper = require("../response-mapper");
+const utils = require("../utils");
 
 module.exports = function (Dataset) {
   /**
@@ -50,7 +50,7 @@ module.exports = function (Dataset) {
 
   Dataset.count = async function (where) {
     try {
-      const scicatFilter = filterMapper.dataset({where});
+      const scicatFilter = filterMapper.dataset({ where });
       return await scicatDatasetService.count(scicatFilter);
     } catch (err) {
       throw err;
@@ -84,19 +84,19 @@ module.exports = function (Dataset) {
 
   Dataset.countFiles = async function (id, where) {
     try {
-      const scicatFilter = filterMapper.files({where});
+      const scicatFilter = filterMapper.files({ where });
       const origDatablocks = await scicatDatasetService.findByIdFiles(
         id,
         scicatFilter,
       );
       const files = responseMapper.files(origDatablocks);
-      return {count: files.length};
+      return { count: files.length };
     } catch (err) {
       throw err;
     }
   };
 
-  Dataset.afterRemote('find', (ctx, result, next) => {
+  Dataset.afterRemote("find", (ctx, result, next) => {
     const filter = ctx.args.filter ? ctx.args.filter : {};
     const inclusions = utils.getInclusionNames(filter);
 
