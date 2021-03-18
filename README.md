@@ -1,6 +1,6 @@
 # Photon and Neutron Search Api
 
-[![Build Status](https://github.com/SciCatProject/panosc-search-api/actions/workflows/test.yml/badge.svg?branch=develop)](https://github.com/SciCatProject/panosc-search-api/actions)
+[![Build Status](https://github.com/SciCatProject/panosc-search-api/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/SciCatProject/panosc-search-api/actions)
 [![Known Vulnerabilities](https://snyk.io/test/github/SciCatProject/panosc-search-api/master/badge.svg?targetFile=package.json)](https://snyk.io/test/github/SciCatProject/panosc-search-api/master?targetFile=package.json)
 
 ## Prerequisites
