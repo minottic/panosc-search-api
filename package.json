@@ -14,7 +14,7 @@
     "lint": "eslint --fix .",
     "start": "node .",
     "test": "mocha --timeout=30000 --exit",
-    "posttest": "npm run lint"
+    "posttest": "eslint ."
   },
   "repository": {
     "type": "git"
