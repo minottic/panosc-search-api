@@ -14,7 +14,9 @@
     "lint": "eslint --fix .",
     "start": "node .",
     "test": "mocha --timeout=30000 --exit",
-    "posttest": "eslint ."
+    "posttest": "eslint .",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "repository": {
     "type": "git"
@@ -30,6 +32,7 @@
     "loopback-component-explorer": "^6.5.1",
     "mathjs": "^7.6.0",
     "serve-favicon": "^2.5.0",
+    "snyk": "^1.495.0",
     "strong-error-handler": "^3.5.0",
     "superagent": "^5.3.1"
   },
