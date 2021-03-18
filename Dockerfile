@@ -1,6 +1,6 @@
 FROM node:14-alpine
 
-RUN apk update && apk ugrade
+RUN apk update && apk upgrade
 
 ARG BASE_URL="https://scicat.ess.eu/api/v3"
 ARG FACILITY="ESS"
