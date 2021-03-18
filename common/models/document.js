@@ -14,17 +14,13 @@ module.exports = function (Document) {
    */
 
   Document.find = async function (filter) {
-    try {
-      const scicatFilter = filterMapper.document(filter);
-      const publishedData = await scicatPublishedDataService.find(scicatFilter);
-      return await Promise.all(
-        publishedData.map(
-          async (data) => await responseMapper.document(data, filter),
-        ),
-      );
-    } catch (err) {
-      throw err;
-    }
+    const scicatFilter = filterMapper.document(filter);
+    const publishedData = await scicatPublishedDataService.find(scicatFilter);
+    return await Promise.all(
+      publishedData.map(
+        async (data) => await responseMapper.document(data, filter),
+      ),
+    );
   };
 
   /**
@@ -34,16 +30,12 @@ module.exports = function (Document) {
    */
 
   Document.findById = async function (id, filter) {
-    try {
-      const scicatFilter = filterMapper.document(filter);
-      const publishedData = await scicatPublishedDataService.findById(
-        id,
-        scicatFilter,
-      );
-      return await responseMapper.document(publishedData, filter);
-    } catch (err) {
-      throw err;
-    }
+    const scicatFilter = filterMapper.document(filter);
+    const publishedData = await scicatPublishedDataService.findById(
+      id,
+      scicatFilter,
+    );
+    return await responseMapper.document(publishedData, filter);
   };
 
   /**
@@ -52,12 +44,8 @@ module.exports = function (Document) {
    */
 
   Document.count = async function (where) {
-    try {
-      const scicatFilter = filterMapper.document({ where });
-      return await scicatPublishedDataService.count(scicatFilter.where);
-    } catch (err) {
-      throw err;
-    }
+    const scicatFilter = filterMapper.document({ where });
+    return await scicatPublishedDataService.count(scicatFilter.where);
   };
 
   Document.afterRemote("find", (ctx, result, next) => {

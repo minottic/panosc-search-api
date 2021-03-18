@@ -1,5 +1,4 @@
 "use strict";
 
-module.exports = function(Sample) {
-
-};
+// eslint-disable-next-line no-unused-vars
+module.exports = function (Sample) {};

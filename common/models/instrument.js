@@ -14,15 +14,11 @@ module.exports = function (Instrument) {
    */
 
   Instrument.find = async function (filter) {
-    try {
-      const scicatFilter = filterMapper.instrument(filter);
-      const instruments = await scicatInstrumentService.find(scicatFilter);
-      return instruments.map((instrument) =>
-        responseMapper.instrument(instrument),
-      );
-    } catch (err) {
-      throw err;
-    }
+    const scicatFilter = filterMapper.instrument(filter);
+    const instruments = await scicatInstrumentService.find(scicatFilter);
+    return instruments.map((instrument) =>
+      responseMapper.instrument(instrument),
+    );
   };
 
   /**
@@ -32,16 +28,9 @@ module.exports = function (Instrument) {
    */
 
   Instrument.findById = async function (id, filter) {
-    try {
-      const scicatFilter = filterMapper.instrument(filter);
-      const instrument = await scicatInstrumentService.findById(
-        id,
-        scicatFilter,
-      );
-      return responseMapper.instrument(instrument);
-    } catch (err) {
-      throw err;
-    }
+    const scicatFilter = filterMapper.instrument(filter);
+    const instrument = await scicatInstrumentService.findById(id, scicatFilter);
+    return responseMapper.instrument(instrument);
   };
 
   /**
@@ -50,12 +39,8 @@ module.exports = function (Instrument) {
    */
 
   Instrument.count = async function (where) {
-    try {
-      const scicatFilter = filterMapper.instrument({ where });
-      return await scicatInstrumentService.count(scicatFilter.where);
-    } catch (err) {
-      throw err;
-    }
+    const scicatFilter = filterMapper.instrument({ where });
+    return await scicatInstrumentService.count(scicatFilter.where);
   };
 
   Instrument.afterRemote("find", (ctx, result, next) => {
