@@ -1,6 +1,8 @@
 "use strict";
 
+const errors = require('./errors')
 const math = require("mathjs");
+const { writeErrorToResponse } = require("strong-error-handler");
 
 /**
  * Get inclusions from filter
@@ -31,7 +33,7 @@ exports.getInclusionNames = (filter) => {
       .filter(
         (primary) =>
           (primary.scope && primary.scope.where) ||
-            (primary.scope && primary.scope.include),
+          (primary.scope && primary.scope.include),
       )
       .map(({ relation }) => relation)
     : [];
@@ -87,23 +89,23 @@ exports.filterOnSecondary = (result, primary, secondary) =>
   result.filter((item) =>
     Array.isArray(item[primary])
       ? (item[primary] =
-          item[primary].filter((child) =>
-            Array.isArray(child[secondary])
-              ? child[secondary].length > 0
-              : Object.keys(child[secondary]).length > 0,
-          ).length > 0
-            ? item[primary].filter((child) =>
-              Array.isArray(child[secondary])
-                ? child[secondary].length > 0
-                : Object.keys(child[secondary]).length > 0,
-            )
-            : null)
-      : Object.keys(item[primary]).length > 0 &&
         item[primary].filter((child) =>
           Array.isArray(child[secondary])
             ? child[secondary].length > 0
             : Object.keys(child[secondary]).length > 0,
-        ).length > 0,
+        ).length > 0
+          ? item[primary].filter((child) =>
+            Array.isArray(child[secondary])
+              ? child[secondary].length > 0
+              : Object.keys(child[secondary]).length > 0,
+          )
+          : null)
+      : Object.keys(item[primary]).length > 0 &&
+      item[primary].filter((child) =>
+        Array.isArray(child[secondary])
+          ? child[secondary].length > 0
+          : Object.keys(child[secondary]).length > 0,
+      ).length > 0,
   );
 
 /**
@@ -148,25 +150,51 @@ exports.extractParamaterFilter = (where) => {
       Object.keys(condition).includes("name"),
     )
       ? where.and.find((condition) => Object.keys(condition).includes("name"))[
-        "name"
+      "name"
       ]
       : null;
     const value = where.and.find((condition) =>
       Object.keys(condition).includes("value"),
     )
       ? where.and.find((condition) => Object.keys(condition).includes("value"))[
-        "value"
+      "value"
       ]
       : null;
     const unit = where.and.find((condition) =>
       Object.keys(condition).includes("unit"),
     )
       ? where.and.find((condition) => Object.keys(condition).includes("unit"))[
-        "unit"
+      "unit"
       ]
       : null;
     return { name, value, unit };
   } else {
     return { name: null, value: null, unit: null };
   }
+};
+
+exports.filterEmpty = (inclusions, returnObject, entity) => {
+  if (inclusions[entity].where && Object.keys(returnObject[entity]).length == 0) {
+    throw new errors.EmptyFilteredError(entity)
+  }
+};
+
+exports.applyInclusions = (ScicatObject, panoscObject, inclusions, functionMapper) => {
+  return Object.keys(functionMapper).reduce(
+    (accumulator, currentValue) => {
+      if (Object.keys(inclusions).includes(currentValue)) {
+        const ds = { ...accumulator };
+        ds[currentValue] = functionMapper[currentValue](ScicatObject, inclusions);
+        try {
+          this.filterEmpty(inclusions, ds, currentValue);
+        }
+        catch (e) {
+          if (!(Object.values(errors).some(err => e instanceof err))) { throw e }
+          return undefined
+        }
+        return ds;
+      }
+      return accumulator;
+    }, panoscObject
+  );
 };

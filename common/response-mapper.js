@@ -25,67 +25,80 @@ exports.dataset = async (scicatDataset, filter) => {
 
   const inclusions = utils.getInclusions(filter);
 
-  if (Object.keys(inclusions).includes("document")) {
-    const publishedDataFilter = { where: { pidArray: scicatDataset.pid } };
-    const scicatPublishedData = await scicatPublishedDataService.find(
-      publishedDataFilter
-    );
-    dataset.document =
-      scicatPublishedData.length > 0
-        ? await this.document(scicatPublishedData[0], inclusions.document)
-        : {};
-  }
-  if (Object.keys(inclusions).includes("files")) {
-    dataset.files = scicatDataset.origdatablocks
-      ? this.files(scicatDataset.origdatablocks)
-      : [];
-  }
-  if (Object.keys(inclusions).includes("instrument")) {
-    dataset.instrument = scicatDataset.instrument
-      ? this.instrument(scicatDataset.instrument)
-      : {};
-  }
-  if (Object.keys(inclusions).includes("parameters")) {
-    dataset.parameters = scicatDataset.scientificMetadata
-      ? this.parameters(scicatDataset.scientificMetadata, inclusions.parameters)
-      : [];
-  }
-  if (Object.keys(inclusions).includes("samples")) {
-    const sampleId = scicatDataset.sampleId;
-    if (sampleId) {
-      const scicatFilter = filterMapper.sample(inclusions.samples);
-      let filter = {};
-      if (scicatFilter.where) {
-        filter.where = {};
-        if (scicatFilter.where.and) {
-          filter.where.and = [];
-          filter.where.and.push({ sampleId });
-          filter.where.and = filter.where.and.concat(scicatFilter.where.and);
-        } else if (scicatFilter.where.or) {
-          filter.where.and = [];
-          filter.where.and.push({ sampleId });
-          filter.where.and.push({ or: scicatFilter.where.or });
-        } else {
-          filter.where = { and: [{ sampleId }].concat(scicatFilter.where) };
-        }
+  const functionMapper = {
+    document: this.documentToDataset,
+    files: this.filesToDataset,
+    instrument: this.instrumentToDataset,
+    parameters: this.parametersToDataset,
+    samples: this.samplesToDataset,
+    techniques: this.techniquesToDataset,
+  };
+
+  return utils.applyInclusions(scicatDataset, dataset, inclusions, functionMapper);
+};
+
+exports.documentToDataset = async (scicatDataset, inclusions) => {
+  const publishedDataFilter = { where: { pidArray: scicatDataset.pid } };
+  const scicatPublishedData = await scicatPublishedDataService.find(
+    publishedDataFilter
+  );
+  return scicatPublishedData.length > 0
+    ? await this.document(scicatPublishedData[0], inclusions.document)
+    : {};
+};
+
+exports.filesToDataset = (scicatDataset) => {
+  return scicatDataset.origdatablocks
+    ? this.files(scicatDataset.origdatablocks)
+    : [];
+};
+
+exports.instrumentToDataset = (scicatDataset) => {
+  return scicatDataset.instrument
+    ? this.instrument(scicatDataset.instrument)
+    : {};
+};
+
+exports.parametersToDataset = (scicatDataset, inclusions) => {
+  return scicatDataset.scientificMetadata
+    ? this.parameters(scicatDataset.scientificMetadata, inclusions.parameters)
+    : [];
+};
+
+exports.samplesToDataset = async (scicatDataset, inclusions) => {
+  const sampleId = scicatDataset.sampleId;
+  if (sampleId) {
+    const scicatFilter = filterMapper.sample(inclusions.samples);
+    let filter = {};
+    if (scicatFilter.where) {
+      filter.where = {};
+      if (scicatFilter.where.and) {
+        filter.where.and = [];
+        filter.where.and.push({ sampleId });
+        filter.where.and = filter.where.and.concat(scicatFilter.where.and);
+      } else if (scicatFilter.where.or) {
+        filter.where.and = [];
+        filter.where.and.push({ sampleId });
+        filter.where.and.push({ or: scicatFilter.where.or });
       } else {
-        filter.where = { sampleId };
+        filter.where = { and: [{ sampleId }].concat(scicatFilter.where) };
       }
-      const scicatSamples = await scicatSampleService.find(filter);
-      dataset.samples =
-        scicatSamples.length > 0
-          ? scicatSamples.map((sample) => this.sample(sample))
-          : [];
     } else {
-      dataset.samples = [];
+      filter.where = { sampleId };
     }
-  }
-  if (Object.keys(inclusions).includes("techniques")) {
-    dataset.techniques = scicatDataset.techniques
-      ? scicatDataset.techniques
+    const scicatSamples = await scicatSampleService.find(filter);
+    return scicatSamples.length > 0
+      ? scicatSamples.map((sample) => this.sample(sample))
       : [];
+  } else {
+    return [];
   }
-  return dataset;
+};
+
+exports.techniquesToDataset = (scicatDataset) => {
+  return scicatDataset.techniques
+    ? scicatDataset.techniques
+    : [];
 };
 
 /**
@@ -107,53 +120,62 @@ exports.document = async (scicatPublishedData, filter) => {
 
   const inclusions = utils.getInclusions(filter);
 
-  if (Object.keys(inclusions).includes("datasets")) {
-    const scicatFilter = filterMapper.dataset(inclusions.datasets);
-    const pidArray = scicatPublishedData.pidArray.map((pid) =>
-      pid.split("/")[0] === pid.split("/")[1]
-        ? pid.split("/").slice(1).join("/")
-        : pid
-    );
-    const datasets = await Promise.all(
-      pidArray.map(async (pid) => {
-        let filter = {};
-        if (scicatFilter.where) {
-          filter.where = {};
-          if (scicatFilter.where.and) {
-            filter.where.and = [];
-            filter.where.and.push({ pid });
-            filter.where.and = filter.where.and.concat(scicatFilter.where.and);
-          } else if (scicatFilter.where.or) {
-            filter.where.and = [];
-            filter.where.and.push({ pid });
-            filter.where.and.push({ or: scicatFilter.where.or });
-          } else {
-            filter.where = { and: [{ pid }].concat(scicatFilter.where) };
-          }
-        } else {
-          filter.where = { pid };
-        }
-        if (scicatFilter.include) {
-          filter.include = scicatFilter.include;
-        }
-        const datasets = await scicatDatasetService.find(filter);
-        return datasets.length > 0 ? datasets[0] : {};
-      })
-    );
-    document.datasets = await Promise.all(
-      datasets.map(
-        async (dataset) => await this.dataset(dataset, inclusions.datasets)
-      )
-    );
-  }
-  if (Object.keys(inclusions).includes("members")) {
-    document.members = this.members(scicatPublishedData, inclusions.members);
-  }
-  if (Object.keys(inclusions).includes("parameters")) {
-    document.parameters = [];
-  }
-  return document;
+  const functionMapper = {
+    dataset: this.datasetToDocument,
+    members: this.membersToDocument,
+    parameters: this.paramatersToDocument,
+  };
+
+  return utils.applyInclusions(scicatPublishedData, document, inclusions, functionMapper);
 };
+
+exports.datasetToDocument = async (scicatPublishedData, inclusions) => {
+  const scicatFilter = filterMapper.dataset(inclusions.datasets);
+  const pidArray = scicatPublishedData.pidArray.map((pid) =>
+    pid.split("/")[0] === pid.split("/")[1]
+      ? pid.split("/").slice(1).join("/")
+      : pid
+  );
+  const datasets = await Promise.all(
+    pidArray.map(async (pid) => {
+      let filter = {};
+      if (scicatFilter.where) {
+        filter.where = {};
+        if (scicatFilter.where.and) {
+          filter.where.and = [];
+          filter.where.and.push({ pid });
+          filter.where.and = filter.where.and.concat(scicatFilter.where.and);
+        } else if (scicatFilter.where.or) {
+          filter.where.and = [];
+          filter.where.and.push({ pid });
+          filter.where.and.push({ or: scicatFilter.where.or });
+        } else {
+          filter.where = { and: [{ pid }].concat(scicatFilter.where) };
+        }
+      } else {
+        filter.where = { pid };
+      }
+      if (scicatFilter.include) {
+        filter.include = scicatFilter.include;
+      }
+      const datasets = await scicatDatasetService.find(filter);
+      return datasets.length > 0 ? datasets[0] : {};
+    })
+  );
+  return await Promise.all(
+    datasets.map(
+      async (dataset) => await this.dataset(dataset, inclusions.datasets)
+    )
+  );
+};
+
+exports.membersToDocument = (scicatPublishedData, inclusions) => {
+  return this.members(scicatPublishedData, inclusions.members);
+};
+
+exports.paramatersToDocument = () => {
+  return [];
+}
 
 /**
  * Map an array of SciCat origDatablocks to an array of PaNOSC files

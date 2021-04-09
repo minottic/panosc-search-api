@@ -18,6 +18,7 @@ exports.Dataset = class {
       ? baseUrl + "/Datasets?filter=" + jsonFilter
       : baseUrl + "/Datasets";
     const res = await superagent.get(url);
+    console.log(url)
     return JSON.parse(res.text);
   }
 

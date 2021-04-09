@@ -1,6 +1,7 @@
 "use strict";
 
 const ScicatService = require("../scicat-service");
+const errors = require('../errors')
 const scicatDatasetService = new ScicatService.Dataset();
 
 const filterMapper = require("../filter-mapper");
@@ -22,6 +23,18 @@ module.exports = function (Dataset) {
       ),
     );
   };
+
+
+  Dataset.afterRemote("find", async function (ctx, datasets, next) {
+    ctx.result = await Promise.all(
+      datasets.map(
+        async dataset => {
+          return dataset.catch(e => { if (!(Object.values(errors).some(err => e instanceof err))) { throw e } })
+        }
+      )).then(value => value.filter(v => v));
+    next();
+  });
+
 
   /**
    * Find a model instance by {{id}} from the data source.
