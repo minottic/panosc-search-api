@@ -37,9 +37,7 @@ exports.getInclusionNames = (filter) => {
     : [];
 
   return primaryInclusions.length > 0 &&
-    filter.include.filter(
-      (inclusion) => inclusion.scope && inclusion.scope.include,
-    ).length > 0
+    filter.include.filter((inclusion) => inclusion.scope).length > 0
     ? Object.assign(
       ...primaryInclusions.map((primary) => ({
         [primary]: [].concat.apply(
@@ -62,6 +60,23 @@ exports.getInclusionNames = (filter) => {
 };
 
 /**
+ * Filter out objects in array having all undefined values or return empty object having all values undefined
+ * @param {object[]|object} result The result from the LoopBack query relation
+ * @returns {object[]|object} Sanitized result
+ */
+
+exports.filterObjectsEmptyValues = (result) =>
+  Array.isArray(result)
+    ? result.filter((item) =>
+      Object.values(item).length > 0
+        ? Object.values(item).some((v) => v !== undefined)
+        : true
+    )
+    : Object.values(result).some((v) => v !== undefined)
+      ? result
+      : {};
+
+/**
  * Filter result on primary relation
  * @param {object[]} result The result from the LoopBack query
  * @param {string} primary Name of the primary relation
@@ -69,10 +84,9 @@ exports.getInclusionNames = (filter) => {
  */
 
 exports.filterOnPrimary = (result, primary) =>
-  result.filter((item) =>
-    Array.isArray(item[primary])
-      ? item[primary].length > 0
-      : Object.keys(item[primary]).length > 0,
+  result.filter(
+    (item) =>
+      Object.values(this.filterObjectsEmptyValues(item[primary])).length > 0
   );
 
 /**
@@ -86,24 +100,13 @@ exports.filterOnPrimary = (result, primary) =>
 exports.filterOnSecondary = (result, primary, secondary) =>
   result.filter((item) =>
     Array.isArray(item[primary])
-      ? (item[primary] =
-          item[primary].filter((child) =>
-            Array.isArray(child[secondary])
-              ? child[secondary].length > 0
-              : Object.keys(child[secondary]).length > 0,
-          ).length > 0
-            ? item[primary].filter((child) =>
-              Array.isArray(child[secondary])
-                ? child[secondary].length > 0
-                : Object.keys(child[secondary]).length > 0,
-            )
-            : null)
-      : Object.keys(item[primary]).length > 0 &&
-        item[primary].filter((child) =>
-          Array.isArray(child[secondary])
-            ? child[secondary].length > 0
-            : Object.keys(child[secondary]).length > 0,
-        ).length > 0,
+      ? (item[primary] = this.filterOnPrimary(item[primary], secondary)) &&
+        item[primary].length > 0
+      : (Object.keys(item[primary]).length > 0 && item[primary][secondary]
+        ? (item[primary][secondary] = this.filterObjectsEmptyValues(
+          item[primary][secondary]
+        ))
+        : null) && Object.keys(item[primary][secondary]).length > 0
   );
 
 /**
