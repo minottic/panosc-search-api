@@ -19,13 +19,13 @@ exports.dataset = (filter) => {
     }
     if (filter.include) {
       const parameters = filter.include.find(
-        (inclusion) => inclusion.relation === "parameters",
+        (inclusion) => inclusion.relation === "parameters"
       );
       if (parameters && parameters.scope && parameters.scope.where) {
         scicatFilter = mapField(parameters, scicatFilter);
       }
       const techniques = filter.include.find(
-        (inclusion) => inclusion.relation === "techniques",
+        (inclusion) => inclusion.relation === "techniques"
       );
       if (techniques && techniques.scope && techniques.scope.where) {
         scicatFilter = mapField(techniques, scicatFilter);
@@ -84,7 +84,7 @@ exports.document = (filter) => {
     }
     if (filter.include) {
       const members = filter.include.find(
-        (inclusion) => inclusion.relation === "members",
+        (inclusion) => inclusion.relation === "members"
       );
 
       if (members && members.scope) {
@@ -119,7 +119,7 @@ exports.files = (filter) => {
   if (!filter) {
     scicatFilter.include = [{ relation: "origdatablocks" }];
   } else {
-    if (filter.where && filter.where !== undefined) {
+    if (filter.where) {
       scicatFilter.include = [
         { relation: "origdatablocks", scope: { where: filter.where } },
       ];
@@ -144,11 +144,11 @@ exports.instrument = (filter) => {
     if (filter.where) {
       if (filter.where.and) {
         filter.where.and = filter.where.and.filter(
-          (where) => !Object.keys(where).includes("facility"),
+          (where) => !Object.keys(where).includes("facility")
         );
       } else if (filter.where.or) {
         filter.where.or = filter.where.or.filter(
-          (where) => !Object.keys(where).includes("facility"),
+          (where) => !Object.keys(where).includes("facility")
         );
       } else {
         if (filter.where.facility) {
@@ -206,22 +206,22 @@ const mapWhereFilter = (where, model) => {
         Object.assign(
           ...Object.keys(item).map((key) => ({
             [mappings.panoscToScicatDataset[key]]: item[key],
-          })),
-        ),
+          }))
+        )
       );
     } else if (where.or) {
       scicatWhere.or = where.or.map((item) =>
         Object.assign(
           ...Object.keys(item).map((key) => ({
             [mappings.panoscToScicatDataset[key]]: item[key],
-          })),
-        ),
+          }))
+        )
       );
     } else {
       scicatWhere = Object.assign(
         ...Object.keys(where).map((key) => ({
           [mappings.panoscToScicatDataset[key]]: where[key],
-        })),
+        }))
       );
     }
     break;
@@ -232,22 +232,22 @@ const mapWhereFilter = (where, model) => {
         Object.assign(
           ...Object.keys(item).map((key) => ({
             [mappings.panoscToScicatDocument[key]]: item[key],
-          })),
-        ),
+          }))
+        )
       );
     } else if (where.or) {
       scicatWhere.or = where.or.map((item) =>
         Object.assign(
           ...Object.keys(item).map((key) => ({
             [mappings.panoscToScicatDocument[key]]: item[key],
-          })),
-        ),
+          }))
+        )
       );
     } else {
       scicatWhere = Object.assign(
         ...Object.keys(where).map((key) => ({
           [mappings.panoscToScicatDocument[key]]: where[key],
-        })),
+        }))
       );
     }
     break;
@@ -258,22 +258,22 @@ const mapWhereFilter = (where, model) => {
         Object.assign(
           ...Object.keys(item).map((key) => ({
             [mappings.panoscToScicatFile[key]]: item[key],
-          })),
-        ),
+          }))
+        )
       );
     } else if (where.or) {
       scicatWhere.or = where.or.map((item) =>
         Object.assign(
           ...Object.keys(item).map((key) => ({
             [mappings.panoscToScicatFile[key]]: item[key],
-          })),
-        ),
+          }))
+        )
       );
     } else {
       scicatWhere = Object.assign(
         ...Object.keys(where).map((key) => ({
           [mappings.panoscToScicatFile[key]]: where[key],
-        })),
+        }))
       );
     }
     break;
@@ -299,7 +299,7 @@ const mapWhereFilter = (where, model) => {
           ...Object.keys(where).map((key) => ({
             creator: where[key],
             authors: where[key],
-          })),
+          }))
         ),
       ];
     }
@@ -316,12 +316,12 @@ const mapWhereFilter = (where, model) => {
               const extractedValue = Object.values(value).pop();
               if (Array.isArray(extractedValue)) {
                 const arrayValues = extractedValue.map((value) =>
-                  utils.convertToSI(value, unit),
+                  utils.convertToSI(value, unit)
                 );
                 const formattedValueSI = Object.assign(
                   ...Object.keys(value).map((key) => ({
                     [key]: arrayValues.map((item) => item.valueSI),
-                  })),
+                  }))
                 );
                 const unitSI = arrayValues.pop().unitSI;
                 scicatWhere.and.push({
@@ -333,10 +333,10 @@ const mapWhereFilter = (where, model) => {
               } else {
                 const { valueSI, unitSI } = utils.convertToSI(
                   extractedValue,
-                  unit,
+                  unit
                 );
                 const formattedValueSI = Object.assign(
-                  ...Object.keys(value).map((key) => ({ [key]: valueSI })),
+                  ...Object.keys(value).map((key) => ({ [key]: valueSI }))
                 );
                 scicatWhere.and.push({
                   [`scientificMetadata.${name}.valueSI`]: formattedValueSI,
@@ -375,7 +375,7 @@ const mapWhereFilter = (where, model) => {
       }
     } else if (where.or) {
       const parameters = where.or.map((condition) =>
-        utils.extractParamaterFilter(condition),
+        utils.extractParamaterFilter(condition)
       );
       const scientificMetadata = parameters.map(({ name, value, unit }) => {
         if (name) {
@@ -386,12 +386,12 @@ const mapWhereFilter = (where, model) => {
                 const extractedValue = Object.values(value).pop();
                 if (Array.isArray(extractedValue)) {
                   const arrayValues = extractedValue.map((value) =>
-                    utils.convertToSI(value, unit),
+                    utils.convertToSI(value, unit)
                   );
                   const formattedValueSI = Object.assign(
                     ...Object.keys(value).map((key) => ({
                       [key]: arrayValues.map((item) => item.valueSI),
-                    })),
+                    }))
                   );
                   const unitSI = arrayValues.pop().unitSI;
                   filter.and.push({
@@ -403,10 +403,10 @@ const mapWhereFilter = (where, model) => {
                 } else {
                   const { valueSI, unitSI } = utils.convertToSI(
                     extractedValue,
-                    unit,
+                    unit
                   );
                   const formattedValueSI = Object.assign(
-                    ...Object.keys(value).map((key) => ({ [key]: valueSI })),
+                    ...Object.keys(value).map((key) => ({ [key]: valueSI }))
                   );
                   filter.and.push({
                     [`scientificMetadata.${name}.valueSI`]: formattedValueSI,
@@ -445,7 +445,7 @@ const mapWhereFilter = (where, model) => {
       });
       if (
         scientificMetadata.some((condition) =>
-          Object.keys(condition).includes("and"),
+          Object.keys(condition).includes("and")
         )
       ) {
         scicatWhere.or = scientificMetadata;
@@ -471,22 +471,22 @@ const mapWhereFilter = (where, model) => {
         Object.assign(
           ...Object.keys(item).map((key) => ({
             [mappings.panoscToScicatSample[key]]: item[key],
-          })),
-        ),
+          }))
+        )
       );
     } else if (where.or) {
       scicatWhere.or = where.or.map((item) =>
         Object.assign(
           ...Object.keys(item).map((key) => ({
             [mappings.panoscToScicatSample[key]]: item[key],
-          })),
-        ),
+          }))
+        )
       );
     } else {
       scicatWhere = Object.assign(
         ...Object.keys(where).map((key) => ({
           [mappings.panoscToScicatSample[key]]: where[key],
-        })),
+        }))
       );
     }
     break;
@@ -497,22 +497,22 @@ const mapWhereFilter = (where, model) => {
         Object.assign(
           ...Object.keys(item).map((key) => ({
             [mappings.panoscToScicatTechniques[key]]: item[key],
-          })),
-        ),
+          }))
+        )
       );
     } else if (where.or) {
       scicatWhere.or = where.or.map((item) =>
         Object.assign(
           ...Object.keys(item).map((key) => ({
             [mappings.panoscToScicatTechniques[key]]: item[key],
-          })),
-        ),
+          }))
+        )
       );
     } else {
       scicatWhere = Object.assign(
         ...Object.keys(where).map((key) => ({
           [mappings.panoscToScicatTechniques[key]]: where[key],
-        })),
+        }))
       );
     }
     break;
@@ -538,7 +538,7 @@ const mapIncludeFilter = (include) =>
         if (item.scope.where) {
           inclusion.scope.where = mapWhereFilter(
             item.scope.where,
-            item.relation,
+            item.relation
           );
         }
       }
@@ -594,13 +594,13 @@ const mapField = (field, filter) => {
 
 const mapMembers = (members, filter) => {
   const person = members.scope.include.find(
-    (inclusion) => inclusion.relation === "person",
+    (inclusion) => inclusion.relation === "person"
   );
   if (person.scope && person.scope.where) {
     if (filter.where) {
       const scicatMembers = mapWhereFilter(
         person.scope.where,
-        members.relation,
+        members.relation
       );
       if (filter.where.and) {
         filter.where.and = filter.where.and.concat(scicatMembers);
